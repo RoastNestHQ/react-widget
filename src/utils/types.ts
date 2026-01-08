@@ -43,13 +43,15 @@ export interface NotificationMessage {
     type: "info" | "hint" | "offer" | "reward" | "social" | "urgent";
 }
 
-export type WidgetPlacement =
+export type IslandPlacement =
     | "left-center"
     | "left-bottom"
     | "right-center"
     | "right-bottom"
     | "bottom-left"
     | "bottom-right";
+
+export type IslandMode = "default" | "icon";
 
 export type FormSubmitHandler = (data: FormDataProps) => Promise<boolean>;
 
@@ -67,7 +69,8 @@ export interface WidgetCustomizeProps {
         };
     };
     island?: {
-        placement?: WidgetPlacement;
+        mode?: IslandMode;
+        placement?: IslandPlacement;
         className?: string;
         label?: string;
         switchButton?: {

@@ -15,6 +15,7 @@ const defaultCustomize: WidgetCustomizeProps = {
         },
     },
     island: {
+        mode: "default",
         label: "Roast Mode",
         placement: "left-center",
     },
