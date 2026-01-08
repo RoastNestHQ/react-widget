@@ -16,6 +16,7 @@ import {
     overlayElmentClassName,
     popoverElmentClassName,
 } from "../../utils/classNames";
+import defaultCustomize from "../../utils/defaultCustomize";
 
 const initialSelectedValue: SelectedElement = {
     position: { x: 0, y: 0 },
@@ -77,6 +78,21 @@ function Provider({
 
     const takeScreenshot = async (element: HTMLElement) => {
         const backgroundColor = getBackgroundColor(element);
+        const ignoreElementClassNames = [popoverElmentClassName, buttonElmentClassName, overlayElmentClassName];
+
+        const excludeFullPageScreenshot =
+            customize?.form?.output?.excludeFullPageScreenshot ||
+            defaultCustomize?.form?.output?.excludeFullPageScreenshot ||
+            false;
+        const excludeSelectedElementScreenshot =
+            customize?.form?.output?.excludeSelectedElementScreenshot ||
+            defaultCustomize?.form?.output?.excludeSelectedElementScreenshot ||
+            false;
+
+        // Mark the real element so we can find it in the clone
+        // We use a data attribute instead of modifying styles directly
+        const targetAttr = "data-screenshot-target";
+        element.setAttribute(targetAttr, "true");
 
         // Always clear previous screenshots before taking new ones
         setScreenshotBlobs([]);
@@ -84,29 +100,45 @@ function Provider({
         // Take screenshot of selected element
         // TODO: Handle errors in screenshot capture
         // Error: Unable to find element in cloned iframe
-        await html2canvas(element, { backgroundColor }).then((canvas) => {
-            canvas.toBlob(
-                (blob) => blob && setScreenshotBlobs((prev) => [...prev, { type: "selected-screenshot", blob }]),
-                "image/png"
-            );
-        });
+        if (!excludeSelectedElementScreenshot) {
+            await html2canvas(element, { backgroundColor }).then((canvas) => {
+                canvas.toBlob(
+                    (blob) => blob && setScreenshotBlobs((prev) => [...prev, { type: "selected-screenshot", blob }]),
+                    "image/png"
+                );
+            });
+        }
 
-        const ignoreElementClassNames = [popoverElmentClassName, buttonElmentClassName, overlayElmentClassName];
+        if (!excludeFullPageScreenshot) {
+            // Take screenshot of full page with Outline
+            await html2canvas(document.body, {
+                useCORS: true,
+                foreignObjectRendering: true,
+                ignoreElements: (el: Element): boolean => {
+                    return ignoreElementClassNames.some((cn: string) => el.classList.contains(cn));
+                },
+                // Use onclone to modify the duplicate document
+                onclone: (clonedDocument) => {
+                    // Find the element inside the CLONED DOM
+                    const clonedElement = clonedDocument.querySelector(`[${targetAttr}="true"]`) as HTMLElement;
 
-        // Take screenshot of full page
-        await html2canvas(document.body, {
-            useCORS: true,
-            foreignObjectRendering: true,
-            ignoreElements: (element: Element): boolean => {
-                // Ignore elements that should not be captured
-                return ignoreElementClassNames.some((cn: string) => element.classList.contains(cn));
-            },
-        }).then((canvas) => {
-            canvas.toBlob(
-                (blob) => blob && setScreenshotBlobs((prev) => [...prev, { type: "full-screenshot", blob }]),
-                "image/png"
-            );
-        });
+                    // Apply the outline to the clone only.
+                    // The user will NOT see this on their screen.
+                    if (clonedElement) {
+                        clonedElement.style.outline = "4px dashed red";
+                        clonedElement.style.outlineOffset = "2px";
+                    }
+                },
+            }).then((canvas) => {
+                canvas.toBlob(
+                    (blob) => blob && setScreenshotBlobs((prev) => [...prev, { type: "full-screenshot", blob }]),
+                    "image/png"
+                );
+            });
+        }
+
+        // Clean up the marker from the real element
+        element.removeAttribute(targetAttr);
     };
 
     useEffect(() => {
