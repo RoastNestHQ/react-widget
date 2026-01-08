@@ -39,7 +39,7 @@ export interface FormDataProps {
 }
 
 export interface NotificationMessage {
-    message: string;
+    message: string; // max length 22 characters
     type: "info" | "hint" | "offer" | "reward" | "social" | "urgent";
 }
 
@@ -61,6 +61,10 @@ export interface WidgetCustomizeProps {
         submitButton?: { label?: string; className?: string };
         cancelButton?: { label?: string; className?: string };
         messageInput?: { placeholder?: string; className?: string };
+        output?: {
+            excludeFullPageScreenshot?: boolean;
+            excludeSelectedElementScreenshot?: boolean;
+        };
     };
     island?: {
         placement?: WidgetPlacement;
@@ -75,6 +79,12 @@ export interface WidgetCustomizeProps {
     };
     notifications?: {
         enable?: boolean;
+        repeatDelay?: number;
+        displayDuration?: number;
+        repeatAllowed?: boolean;
+        allowDismissal?: boolean;
+        allowParmanentDismissal?: boolean;
+        paramanentDismissalExpiryDays?: number;
         messages?: NotificationMessage[];
     };
 }

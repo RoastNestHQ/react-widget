@@ -9,11 +9,89 @@
     }
 
     .message {
+        gap: 8px;
+        padding: 8px;
+        display: flex;
+        max-width: 240px;
+        position: relative;
         width: fit-content;
-        padding: 8px 16px;
-        border-radius: 24px;
-        color: var(--rrn-clr-900);
+        border-radius: 4px;
+        align-items: center;
         background: var(--rrn-clr-50);
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+
+        .close-btn {
+            color: var(--rrn-clr-900);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background-color: var(--rrn-clr-50);
+            position: absolute;
+            font-size: 12px;
+            cursor: pointer;
+            border: none;
+
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            line-height: 1;
+
+            top: -6px;
+            right: -6px;
+        }
+
+        .icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--rrn-clr-200);
+            color: var(--rrn-clr-900);
+
+            width: 40px;
+            height: 40px;
+            aspect-ratio: 1;
+            border-radius: 2px;
+
+            svg {
+                width: 20px;
+                height: 20px;
+            }
+        }
+
+        .text {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.2;
+            margin-right: 4px;
+            color: var(--rrn-clr-900);
+        }
+
+        &[data-type="info"] .icon {
+            background-color: #cff4fc;
+            color: #055160;
+        }
+
+        &[data-type="hint"] .icon {
+            background-color: #e2e3e5;
+            color: #41464b;
+        }
+
+        &[data-type="offer"] .icon {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+
+        &[data-type="reward"] .icon {
+            background-color: #fff3cd;
+            color: #664d03;
+        }
+
+        &[data-type="social"] .icon {
+            background-color: #cfe2ff;
+            color: #084298;
+        }
+
+        &[data-type="urgent"] .icon {
+            background-color: #f8d7da;
+            color: #842029;
+        }
     }
 }
