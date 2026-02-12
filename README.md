@@ -50,7 +50,7 @@ React Roast is an open-source app inspector that allows users to select elements
 -   🟦 Written in Typescript and built using rollup
 -   🌐 Works in both local and remote modes
 -   🛠️ Imperative control via `useReactRoast` hook
--   🖼️ Flexible screenshot options: full page or selected element
+-   🖼️ Flexible screenshot options: full page, selected element, or both (configurable)
 -   📤 Easily send feedback to your backend or channels (Slack, Discord, etc.)
 
 ## Installation
@@ -160,38 +160,47 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
 ### Widget Provider Props
 
-| Property       | Type                | Description                                                            |
-| -------------- | ------------------- | ---------------------------------------------------------------------- |
-| `mode`         | `local` or `remote` | Defines if the widget operates locally or remotely                     |
-| `children`     | `ReactNode`         | Nested components inside the provider                                  |
-| `onFormSubmit` | `function`          | Callback for form submission. Returns a boolean for success/failure.   |
-| `customize`    | `object`            | Customization options for widget appearance and behavior. See below.   |
-| `siteId`       | `string`            | Optional site identifier, useful for remote mode or multi-site setups. |
+| Property       | Type                | Description                                                                      |
+| -------------- | ------------------- | -------------------------------------------------------------------------------- |
+| `mode`         | `local` or `remote` | Defines if the widget operates locally or remotely                               |
+| `children`     | `ReactNode`         | Nested components inside the provider                                            |
+| `onFormSubmit` | `function`          | Callback for form submission. Returns a boolean for success/failure.             |
+| `customize`    | `object`            | Customization options for widget appearance, behavior, screenshots, and notices. |
+| `siteId`       | `string`            | Optional site identifier, useful for remote mode or multi-site setups.           |
+| `hideIsland`   | `boolean`           | Hide the floating trigger island while keeping the widget available via hooks.   |
 
 ### Widget Customize Props
 
 Customize the widget by passing the `customize` prop with these options:
 
-| Property                              | Type      | Description                                                         |
-| ------------------------------------- | --------- | ------------------------------------------------------------------- |
-| `form.className`                      | `string`  | Custom CSS class for the form container                             |
-| `form.errorMessage`                   | `string`  | Error message shown when submission fails                           |
-| `form.successMessage`                 | `string`  | Success message shown when submission succeeds                      |
-| `form.messageInput.className`         | `string`  | Custom CSS class for the message input field                        |
-| `form.messageInput.placeholder`       | `string`  | Placeholder text for the message input field                        |
-| `form.submitButton.label`             | `string`  | Label text for the submit button                                    |
-| `form.submitButton.className`         | `string`  | Custom CSS class for the submit button                              |
-| `form.cancelButton.label`             | `string`  | Label text for the cancel button                                    |
-| `form.cancelButton.className`         | `string`  | Custom CSS class for the cancel button                              |
-| `island.placement`                    | `string`  | Position of the island button (`left-center`, `right-bottom`, etc.) |
-| `island.className`                    | `string`  | Custom CSS class for the island button                              |
-| `island.label`                        | `string`  | Label text for the island button                                    |
-| `island.switchButton.className`       | `string`  | Custom CSS class for the switch button inside the island            |
-| `island.switchButton.thumb.className` | `string`  | Custom CSS class for the thumb of the switch button                 |
-| `notifications.enable`                | `boolean` | Enable or disable notifications                                     |
-| `notifications.messages`              | `array`   | Array of notification message objects                               |
-| `notifications.messages.type`         | `string`  | Type of notification message (`info`, `hint`, `offer`, etc.)        |
-| `notifications.messages.message`      | `string`  | Text content of the notification message                            |
+| Property                                      | Type      | Description                                                                                 |
+| --------------------------------------------- | --------- | ------------------------------------------------------------------------------------------- |
+| `form.className`                              | `string`  | Custom CSS class for the form container                                                     |
+| `form.errorMessage`                           | `string`  | Error message shown when submission fails                                                   |
+| `form.successMessage`                         | `string`  | Success message shown when submission succeeds                                              |
+| `form.messageInput.className`                 | `string`  | Custom CSS class for the message input field                                                |
+| `form.messageInput.placeholder`               | `string`  | Placeholder text for the message input field                                                |
+| `form.submitButton.label`                     | `string`  | Label text for the submit button                                                            |
+| `form.submitButton.className`                 | `string`  | Custom CSS class for the submit button                                                      |
+| `form.cancelButton.label`                     | `string`  | Label text for the cancel button                                                            |
+| `form.cancelButton.className`                 | `string`  | Custom CSS class for the cancel button                                                      |
+| `form.output.excludeFullPageScreenshot`       | `boolean` | If `true`, skip capturing a full-page screenshot                                            |
+| `form.output.excludeSelectedElementScreenshot`| `boolean` | If `true`, skip capturing the selected-element screenshot                                   |
+| `island.mode`                                 | `string`  | Display mode for the island button (`default` = label + switch, `icon` = pointer icon only) |
+| `island.placement`                            | `string`  | Position of the island button (`left-center`, `right-bottom`, etc.)                         |
+| `island.className`                            | `string`  | Custom CSS class for the island button                                                      |
+| `island.label`                                | `string`  | Label text for the island button                                                            |
+| `island.switchButton.className`               | `string`  | Custom CSS class for the switch button inside the island                                    |
+| `island.switchButton.thumb.className`         | `string`  | Custom CSS class for the thumb of the switch button                                         |
+| `notifications.enable`                        | `boolean` | Enable or disable notifications                                                             |
+| `notifications.repeatDelay`                   | `number`  | Seconds to wait between showing notification messages                                       |
+| `notifications.displayDuration`               | `number`  | Seconds each notification stays visible                                                     |
+| `notifications.allowDismissal`                | `boolean` | Allow the user to dismiss notifications for the current session                             |
+| `notifications.allowParmanentDismissal`       | `boolean` | Allow the user to permanently dismiss notifications across sessions                         |
+| `notifications.paramanentDismissalExpiryDays` | `number`  | Number of days after which a permanent dismissal expires and notifications start again      |
+| `notifications.messages`                      | `array`   | Array of notification message objects                                                       |
+| `notifications.messages.type`                 | `string`  | Type of notification message (`info`, `hint`, `offer`, etc.)                                |
+| `notifications.messages.message`              | `string`  | Text content of the notification message                                                    |
 
 **Example usage:**
 
@@ -255,20 +264,30 @@ const defaultCustomize = {
         cancelButton: { label: "Cancel" },
         errorMessage: "Failed to submit message",
         successMessage: "Message Submitted",
+        output: {
+            excludeFullPageScreenshot: false,
+            excludeSelectedElementScreenshot: false,
+        },
     },
     island: {
+        mode: "default",
         label: "Roast Mode",
         placement: "left-center",
     },
     notifications: {
         enable: true,
+        repeatDelay: 15,
+        displayDuration: 5,
+        allowDismissal: true,
+        allowParmanentDismissal: false,
+        paramanentDismissalExpiryDays: 7,
         messages: [
-            { message: "✨ Feedback help us improve!", type: "info" },
-            { message: "👈 Click here to share feedback", type: "hint" },
-            { message: "🎁 Give feedback and get discount", type: "offer" },
-            { message: "💎 You’ve earned discount! Redeem them now.", type: "reward" },
-            { message: "⭐ Users love this feature!", type: "social" },
-            { message: "⏰ Last chance! discount ends in 2 days.", type: "urgent" },
+            { message: "Feedback help us improve! Share your thoughts.", type: "info" },
+            { message: "Click here to share feedback with us.", type: "hint" },
+            { message: "Give feedback and get discounts!", type: "offer" },
+            { message: "You’ve earned discount! Redeem them now.", type: "reward" },
+            { message: "20+ Users love our product! Join them now.", type: "social" },
+            { message: "Last chance! discount ends in 2 days. Hurry up!", type: "urgent" },
         ],
     },
 };
