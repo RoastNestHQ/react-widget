@@ -1,0 +1,33 @@
+import { ReferralWidgetProps } from "./types";
+
+export const DEFAULT_WIDGET_PROPS: Partial<ReferralWidgetProps> = {
+  appName: "App",
+  expiryHours: 24,
+  buttonLabel: "Invite Friends",
+  buttonPosition: "bottom-right",
+  popupWidth: 380,
+  backdropColor: "rgba(0,0,0,0.5)",
+  showRewardCode: true,
+  rewardCodeLabel: "REWARD CODE",
+  showReferralLink: true,
+  referralLinkLabel: "REFERRAL LINK",
+  copySuccessLabel: "Copied!",
+  copySuccessDuration: 2000,
+  showShareButton: true,
+  shareButtonLabel: "Share",
+  copyLinkButtonLabel: "Copy Link",
+  closeOnBackdropClick: true,
+  showExpiry: true,
+  theme: {
+    primaryColor: "#111111",
+    accentColor: "#2563eb",
+    successColor: "#16a34a",
+    backgroundColor: "#ffffff",
+    textColor: "#111111",
+    mutedTextColor: "#6b7280",
+    borderColor: "#e5e7eb",
+    codeBoxColor: "#fefce8",
+    borderRadius: "12px",
+    fontFamily: "inherit",
+  }
+};

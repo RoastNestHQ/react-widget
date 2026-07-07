@@ -1,0 +1,210 @@
+.rrn-lifecycle-container {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  color: #111111;
+}
+
+.rrn-lifecycle-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.rrn-lifecycle-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.rrn-lifecycle-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.rrn-lifecycle-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.rrn-lifecycle-btn-primary {
+  background: #2563eb;
+  color: white;
+}
+
+.rrn-lifecycle-btn-primary:hover {
+  background: #1d4ed8;
+}
+
+.rrn-lifecycle-btn-secondary {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.rrn-lifecycle-btn-secondary:hover {
+  background: #e5e7eb;
+}
+
+.rrn-stages-list {
+  position: relative;
+  padding-left: 20px;
+}
+
+.rrn-stage-item {
+  position: relative;
+  padding-bottom: 24px;
+  padding-left: 24px;
+  opacity: 0.5;
+  transition: opacity 0.3s;
+}
+
+.rrn-stage-item:last-child {
+  padding-bottom: 0;
+}
+
+.rrn-stage-connector {
+  position: absolute;
+  top: 24px;
+  bottom: 0;
+  left: -8px;
+  width: 2px;
+  background: #e5e7eb;
+}
+
+.rrn-stage-item:last-child .rrn-stage-connector {
+  display: none;
+}
+
+.rrn-stage-indicator {
+  position: absolute;
+  left: -14px;
+  top: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  border: 2px solid white;
+  transition: all 0.3s;
+}
+
+/* Status variants */
+.rrn-stage-active {
+  opacity: 1;
+}
+.rrn-stage-active .rrn-stage-indicator {
+  background: #3b82f6;
+  animation: pulse 1.5s infinite;
+}
+
+.rrn-stage-complete {
+  opacity: 1;
+}
+.rrn-stage-complete .rrn-stage-indicator {
+  background: #10b981;
+}
+
+.rrn-stage-failed {
+  opacity: 1;
+}
+.rrn-stage-failed .rrn-stage-indicator {
+  background: #ef4444;
+}
+
+.rrn-stage-content {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 4px;
+}
+
+.rrn-stage-active .rrn-stage-content {
+  border-color: #bfdbfe;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.rrn-stage-title {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.rrn-stage-desc {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.rrn-stage-snippet {
+  background: #111827;
+  color: #f3f4f6;
+  padding: 12px;
+  border-radius: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  margin: 0;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+
+.rrn-split-cards {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+@media (max-width: 600px) {
+  .rrn-split-cards {
+    flex-direction: column;
+  }
+}
+
+.rrn-subcard {
+  flex: 1;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.rrn-subcard h4 {
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  color: #4b5563;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.rrn-subcard p {
+  margin: 0;
+  font-size: 14px;
+  color: #111111;
+  font-weight: 500;
+}
+
+.rrn-success-banner {
+  background: #dcfce7;
+  color: #166534;
+  padding: 12px;
+  border-radius: 6px;
+  margin-top: 16px;
+  font-weight: 600;
+  text-align: center;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(59,130,246,0.4); }
+  50%       { box-shadow: 0 0 0 8px rgba(59,130,246,0); }
+}

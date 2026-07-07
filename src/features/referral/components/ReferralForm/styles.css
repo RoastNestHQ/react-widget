@@ -1,0 +1,6 @@
+.rrn-referral-form {
+    padding: 16px;
+    background: var(--rrn-clr-50);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
