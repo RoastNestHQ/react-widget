@@ -1,4 +1,4 @@
-/* Override rrn-island-button styles for referral icon mode */
+/* Override rrn-trigger-button styles for referral icon mode */
 .rrn-referral-btn[data-mode="icon"] {
   border-radius: 50% !important;
   width: 48px;

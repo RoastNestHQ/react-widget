@@ -7,7 +7,7 @@ export const DEFAULT_WIDGET_PROPS: Partial<ReferralWidgetProps> = {
 	buttonPosition: "bottom-right",
 	popupWidth: 380,
 	backdropColor: "rgba(0,0,0,0.5)",
-	showRewardCode: true,
+	showRewardCode: false,
 	rewardCodeLabel: "REWARD CODE",
 	showReferralLink: true,
 	referralLinkLabel: "REFERRAL LINK",

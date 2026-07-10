@@ -7,17 +7,17 @@ import SquareSolidPointerIcon from "../../../../shared/icons/SquareSolidPointer"
 import SquareDashPointerIcon from "../../../../shared/icons/SquareDashPointer";
 
 function WidgetTriggerButton() {
-    const { active, customize, toggleActive, IslandHidden } = useFeedbackContext();
+    const { active, customize, toggleActive, triggerButtonHidden } = useFeedbackContext();
 
-    if (IslandHidden) return null;
+    if (triggerButtonHidden) return null;
 
-    const islandMode = customize?.island?.mode ?? defaultFeedbackConfig?.island?.mode;
+    const triggerButtonMode = customize?.triggerButton?.mode ?? defaultFeedbackConfig?.triggerButton?.mode;
 
-    if (islandMode === "icon") {
+    if (triggerButtonMode === "icon") {
         return (
             <div
-                data-placement={customize?.island?.placement || defaultFeedbackConfig.island?.placement}
-                className={clsx(CLASS_NAMES.feedback.islandButton, CLASS_NAMES.global.avoidElement, customize?.island?.className)}
+                data-placement={customize?.triggerButton?.placement || defaultFeedbackConfig.triggerButton?.placement}
+                className={clsx(CLASS_NAMES.feedback.triggerButton, CLASS_NAMES.global.avoidElement, customize?.triggerButton?.className)}
                 onClick={toggleActive}
                 data-active={active}
                 data-mode="icon"
@@ -29,13 +29,13 @@ function WidgetTriggerButton() {
 
     return (
         <div
-            data-placement={customize?.island?.placement || defaultFeedbackConfig.island?.placement}
-            className={clsx(CLASS_NAMES.feedback.islandButton, CLASS_NAMES.global.avoidElement, customize?.island?.className)}
+            data-placement={customize?.triggerButton?.placement || defaultFeedbackConfig.triggerButton?.placement}
+            className={clsx(CLASS_NAMES.feedback.triggerButton, CLASS_NAMES.global.avoidElement, customize?.triggerButton?.className)}
             onClick={toggleActive}
         >
-            <p>{customize?.island?.label || defaultFeedbackConfig.island?.label}</p>
-            <div className={clsx("switch-btn", customize?.island?.switchButton?.className)} data-active={active}>
-                <span className={clsx("circle", customize?.island?.switchButton?.thumb?.className)} />
+            <p>{customize?.triggerButton?.label || defaultFeedbackConfig.triggerButton?.label}</p>
+            <div className={clsx("switch-btn", customize?.triggerButton?.switchButton?.className)} data-active={active}>
+                <span className={clsx("circle", customize?.triggerButton?.switchButton?.thumb?.className)} />
             </div>
         </div>
     );

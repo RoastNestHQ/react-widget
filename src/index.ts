@@ -28,8 +28,8 @@ export { FeedbackWidget, FeedbackProvider, useFeedback } from "./features/feedba
 export type {
 	FeedbackCustomizeProps,
 	NotificationMessage,
-	IslandPlacement,
-	IslandMode,
+	TriggerButtonPlacement,
+	TriggerButtonMode,
 	FormSubmitHandler,
 	FeedbackWidgetProps,
 } from "./features/feedback";

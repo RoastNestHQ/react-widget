@@ -37,7 +37,7 @@ const ReferralButton: React.FC<ReferralButtonProps> = ({
 
   return (
     <div
-      className={clsx(CLASS_NAMES.feedback.islandButton, CLASS_NAMES.global.avoidElement, CLASS_NAMES.referral.btn)}
+      className={clsx(CLASS_NAMES.feedback.triggerButton, CLASS_NAMES.global.avoidElement, CLASS_NAMES.referral.btn)}
       data-placement={position}
       data-mode={isIconOnly ? 'icon' : undefined}
       onClick={onClick}

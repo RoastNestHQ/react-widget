@@ -14,7 +14,7 @@ const defaultFeedbackConfig: FeedbackCustomizeProps = {
             excludeSelectedElementScreenshot: false,
         },
     },
-    island: {
+    triggerButton: {
         mode: "default",
         label: "Roast Mode",
         placement: "left-center",

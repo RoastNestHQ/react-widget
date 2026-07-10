@@ -29,10 +29,10 @@ const Notification: React.FC = () => {
     const [isVisible, setIsVisible] = useState(false);
 
     // Roast widget context
-    const { customize, active, IslandHidden } = useFeedbackContext();
+    const { customize, active, triggerButtonHidden } = useFeedbackContext();
 
-    // Do not render if island is hidden
-    if (IslandHidden) return null;
+    // Do not render if triggerButton is hidden
+    if (triggerButtonHidden) return null;
 
     // Use customized messages or default ones
     const messages = customize?.notifications?.messages ?? defaultFeedbackConfig.notifications?.messages;
@@ -47,7 +47,7 @@ const Notification: React.FC = () => {
 
     // Set reference element for floating UI
     useEffect(() => {
-        const element = document.querySelector(`.${CLASS_NAMES.feedback.islandButton}`) as HTMLElement | null;
+        const element = document.querySelector(`.${CLASS_NAMES.feedback.triggerButton}`) as HTMLElement | null;
         setReferenceElement(element);
     }, []);
 

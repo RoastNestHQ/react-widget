@@ -5,7 +5,7 @@ export interface NotificationMessage {
     type: "info" | "hint" | "offer" | "reward" | "social" | "urgent";
 }
 
-export type IslandPlacement =
+export type TriggerButtonPlacement =
     | "left-center"
     | "left-bottom"
     | "right-center"
@@ -13,7 +13,7 @@ export type IslandPlacement =
     | "bottom-left"
     | "bottom-right";
 
-export type IslandMode = "default" | "icon";
+export type TriggerButtonMode = "default" | "icon";
 
 export type FormSubmitHandler = (data: FormDataProps) => Promise<boolean>;
 
@@ -30,9 +30,9 @@ export interface FeedbackCustomizeProps {
             excludeSelectedElementScreenshot?: boolean;
         };
     };
-    island?: {
-        mode?: IslandMode;
-        placement?: IslandPlacement;
+    triggerButton?: {
+        mode?: TriggerButtonMode;
+        placement?: TriggerButtonPlacement;
         className?: string;
         label?: string;
         switchButton?: {

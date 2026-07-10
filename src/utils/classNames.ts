@@ -15,7 +15,7 @@ export const CLASS_NAMES = {
     selectedElement: "rrn-feedback-selected-element",
     popover: "rrn-feedback-popover",
     overlay: "rrn-feedback-overlay",
-    islandButton: "rrn-feedback-island-button",
+    triggerButton: "rrn-feedback-trigger-button",
     form: "rrn-feedback-form",
     formSuccess: "rrn-feedback-form-success",
   },

@@ -5,14 +5,14 @@ import { FeedbackCustomizeProps, FormSubmitHandler } from "./types";
 export interface FeedbackContextType {
     active: boolean;
     windowSize: Size;
-    IslandHidden: boolean;
+    triggerButtonHidden: boolean;
     selected: SelectedElement;
     screenshotBlobs: ScreenshotBlobs;
     customize?: FeedbackCustomizeProps;
     onFormSubmit?: FormSubmitHandler;
     toggleActive: () => void;
     unSelectElement: () => void;
-    setIslandVisibility: (visible: boolean) => void;
+    setTriggerButtonVisibility: (visible: boolean) => void;
 }
 
 export const FeedbackContext = createContext<FeedbackContextType | undefined>(undefined);

@@ -1,4 +1,4 @@
-:where(.rrn-feedback-island-button) {
+:where(.rrn-feedback-trigger-button) {
     top: 50%;
     left: 0px;
     display: flex;

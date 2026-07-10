@@ -9,11 +9,11 @@ import { FeedbackProvider } from "./FeedbackProvider";
 
 export interface FeedbackWidgetProps {
     customize?: FeedbackCustomizeProps;
-    hideIsland?: boolean;
+    hideTriggerButton?: boolean;
     onFormSubmit?: FormSubmitHandler;
 }
 
-export const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({ customize, hideIsland, onFormSubmit }) => {
+export const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({ customize, hideTriggerButton, onFormSubmit }) => {
     const parentContext = useContext(RoastnestContext);
     
     if (!parentContext) {
@@ -21,7 +21,7 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({ customize, hideI
     }
 
     return (
-        <FeedbackProvider customize={customize} hideIsland={hideIsland} onFormSubmit={onFormSubmit}>
+        <FeedbackProvider customize={customize} hideTriggerButton={hideTriggerButton} onFormSubmit={onFormSubmit}>
             <WidgetTriggerButton />
             <WidgetOverlay />
             <FeedbackPopper />

@@ -9,8 +9,8 @@ export { useFeedback } from "./hooks/useFeedback";
 export type {
 	FeedbackCustomizeProps,
 	NotificationMessage,
-	IslandPlacement,
-	IslandMode,
+	TriggerButtonPlacement,
+	TriggerButtonMode,
 	FormSubmitHandler,
 } from "./types";
 export type { FeedbackWidgetProps } from "./FeedbackWidget";

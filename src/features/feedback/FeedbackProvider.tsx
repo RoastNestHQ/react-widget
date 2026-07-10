@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, ReactNode } from "react";
-import html2canvas from "html2canvas-pro";
 
 import getBackgroundColor from "../../utils/getBackgroundColor";
 import { ScreenshotBlobs, SelectedElement, Size } from "../../shared/types";
@@ -19,7 +18,7 @@ const initialSelectedValue: SelectedElement = {
 interface FeedbackProviderProps {
     children: ReactNode;
     customize?: FeedbackCustomizeProps;
-    hideIsland?: boolean;
+    hideTriggerButton?: boolean;
     onFormSubmit?: FormSubmitHandler;
 }
 
@@ -27,7 +26,7 @@ export function FeedbackProvider({
     children,
     customize,
     onFormSubmit,
-    hideIsland = false,
+    hideTriggerButton = false,
 }: FeedbackProviderProps) {
     const [windowSize, setWindowSize] = useState<Size>({
         width: typeof window !== "undefined" ? window.innerWidth : 0,
@@ -35,7 +34,7 @@ export function FeedbackProvider({
     });
     const [selected, setSelected] = useState<SelectedElement>(initialSelectedValue);
     const [screenshotBlobs, setScreenshotBlobs] = useState<ScreenshotBlobs>([]);
-    const [IslandHidden, setIslandHidden] = useState<boolean>(false);
+    const [triggerButtonHidden, settriggerButtonHidden] = useState<boolean>(false);
     const [active, setActive] = useState<boolean>(false);
 
     const toggleActive = useCallback(
@@ -48,12 +47,12 @@ export function FeedbackProvider({
         []
     );
 
-    const setIslandVisibility = useCallback((v: boolean) => setIslandHidden(!v), []);
+    const setTriggerButtonVisibility = useCallback((v: boolean) => settriggerButtonHidden(!v), []);
 
     useEffect(() => {
-        if (hideIsland) setIslandHidden(true);
-        return () => setIslandHidden(false);
-    }, [hideIsland]);
+        if (hideTriggerButton) settriggerButtonHidden(true);
+        return () => settriggerButtonHidden(false);
+    }, [hideTriggerButton]);
 
     const setElementHoverable = (isHoverable: boolean) => {
         if (isHoverable) {
@@ -72,8 +71,9 @@ export function FeedbackProvider({
     }, []);
 
     const takeScreenshot = async (element: HTMLElement) => {
+        const html2canvas = (await import('html2canvas-pro')).default;
         const backgroundColor = getBackgroundColor(element);
-        const ignoreElementClassNames = [CLASS_NAMES.feedback.popover, CLASS_NAMES.feedback.islandButton, CLASS_NAMES.feedback.overlay];
+        const ignoreElementClassNames = [CLASS_NAMES.feedback.popover, CLASS_NAMES.feedback.triggerButton, CLASS_NAMES.feedback.overlay];
 
         const excludeFullPageScreenshot =
             customize?.form?.output?.excludeFullPageScreenshot ||
@@ -213,16 +213,16 @@ export function FeedbackProvider({
                 selected,
                 customize,
                 windowSize,
-                IslandHidden,
+                triggerButtonHidden,
                 onFormSubmit,
                 toggleActive,
                 unSelectElement,
                 screenshotBlobs,
-                setIslandVisibility,
+                setTriggerButtonVisibility,
             }}
         >
             <ToastProvider
-                position={customize?.island?.placement === "bottom-right" ? "top-right" : "bottom-right"}
+                position={customize?.triggerButton?.placement === "bottom-right" ? "top-right" : "bottom-right"}
                 max={10}
             >
                 {children}
