@@ -1,374 +1,206 @@
-# React Roast
+# @roastnest/react
 
-A React widget to get feedback
+The official React SDK for [Roastnest](https://roastnest.com). A unified, lightweight, and customizable client-side package that includes an interactive **Feedback/Bug Reporting Widget**, a **Referral Program Widget**, and **Conversion Tracking APIs**.
 
 ---
 
 ## Table of Contents
 
--   [Purpose](#purpose)
--   [Demo](#demo)
--   [Features](#features)
--   [Installation](#installation)
--   [Usage](#usage)
-    -   [Self-host Usage](#self-host-usage)
-    -   [Hosted Usage](#hosted-usage)
--   [Examples](#examples)
-    -   [Self-Host Example for React](#self-host-example-for-react)
-    -   [Self-Host Example for Nextjs](#self-host-example-for-nextjs)
--   [Props](#props)
-    -   [Widget Provider Props](#widget-provider-props)
-    -   [Widget Customize Props](#widget-customize-props)
-    -   [Default Customization](#default-customization)
-    -   [Form Data Props](#form-data-props)
--   [Hooks](#hooks)
-    -   [useReactRoast](#usereactroast)
--   [Contribution](#contribution)
--   [License](#license)
+- [Features](#features)
+- [Installation](#installation)
+- [Getting Started](#getting-started)
+- [Modes](#modes)
+  - [Self-Hosted Mode](#self-hosted-mode)
+  - [Cloud Mode](#cloud-mode)
+- [Feedback Widget](#feedback-widget)
+  - [Basic Setup](#basic-setup)
+  - [useFeedback Hook](#usefeedback-hook)
+  - [Feedback Customization Props](#feedback-customization-props)
+- [Referral Widget](#referral-widget)
+  - [Basic Setup](#basic-setup-1)
+  - [Auto-generated Referral Links & Validation](#auto-generated-referral-links--validation)
+  - [useReferral Hook & Conversion Tracking](#usereferral-hook--conversion-tracking)
+  - [Referral Lifecycle Visualizer](#referral-lifecycle-visualizer)
+- [License](#license)
 
 ---
 
-## Purpose
-
-React Roast is an open-source app inspector that allows users to select elements on a webpage, capture their state (including screenshots), and send the details to a desired channel. This tool is useful for UI/UX testing, feedback collection, and debugging user interfaces.
-
-## Demo
-
-**Live Demo:** [RoastNest.com](https://roastnest.com) | [Growati.com](https://growati.com)
-
-![Roastnest Widget Demo](https://github.com/user-attachments/assets/41e555a5-e7b1-47c7-8aba-59fd5065f9eb)
-
 ## Features
 
--   🖱️ Select any element on a webpage
--   📸 Capture element position, size, and a screenshot
--   📝 Collect feedback with customizable forms
--   🔔 Supports notifications and user rewards
--   ⚛️ Supports React-based frameworks like Next.js
--   🏠 Self-host and customize widget appearance and behavior
--   ⚡ Lightweight and easy to integrate
--   🟦 Written in Typescript and built using rollup
--   🌐 Works in both local and remote modes
--   🛠️ Imperative control via `useReactRoast` hook
--   🖼️ Flexible screenshot options: full page, selected element, or both (configurable)
--   📤 Easily send feedback to your backend or channels (Slack, Discord, etc.)
+- 🖱️ **Visual Element Selector**: Highlight and select any DOM element to provide contextual feedback.
+- 📸 **Auto Screenshots**: Capture selected element or full-page screenshots using `html2canvas-pro`.
+- 🤝 **Referral & Rewards Widget**: Modern invite cards with clipboard-copying and Web Share API integration.
+- 🔗 **Auto-Generated Referrals**: Client-side referral code generation and persistence via `localStorage`.
+- 🛡️ **Hostname Validation**: Automatically validates `referralLink` domain matching to avoid broken referral loops.
+- 🔌 **Graceful Degradation**: Catches configuration issues internally and degrades safely without crashing your React tree.
+- ⚙️ **Dual Modes**: Support for complete control under **Self-Hosted** (callbacks) or **Cloud** (remote Roastnest server).
+
+---
 
 ## Installation
 
 ```sh
-npm install react-roast
+npm install @roastnest/react
 ```
 
 or
 
 ```sh
-yarn add react-roast
+yarn add @roastnest/react
 ```
 
-## Usage
+---
 
-To use React Roast, wrap your application with the `WidgetProvider` component from `react-roast`. Make sure to use the provider on the client side, set the `mode` prop to `local`, and implement the `onFormSubmit` callback to handle form submissions.
+## Getting Started
 
-### Self-host Usage
-
-1. Install the `react-roast` npm package.
-2. Import and wrap your app with the `WidgetProvider` component.
-3. Set `mode="local"` and implement the `onFormSubmit` callback to process feedback data.
-4. Store feedback data in your preferred backend or database, and return a boolean status.
-5. Optionally, use the `customize` prop to adjust the widget’s appearance and behavior.
-
-### Hosted Usage
-
-1. Sign in to [RoastNest](https://roastnest.com).
-2. Add your site and obtain a unique `siteId`.
-3. Install the `react-roast` npm package.
-4. Import and wrap your app with the `WidgetProvider` component.
-5. Set `mode="remote"` and provide your `siteId` to connect your site or app.
-6. Optionally, use the `customize` prop to tailor the widget for your site.
-
-## Examples
-
-### Self-Host Example for React
+To initialize the SDK, wrap your application inside the `RoastnestProvider` component.
 
 ```tsx
-import WidgetProvider, { FormDataProps } from "react-roast";
+import React from "react";
+import { RoastnestProvider } from "@roastnest/react";
 
 export default function App() {
-    const handleSubmit = async ({ message, email, screenshotBlobs }: FormDataProps): Promise<boolean> => {
-        // Must return boolean value.
-        try {
-            // Send feedback data to your backend
-            // Or send to you channel (e.g., Slack, Discord)
-            return true;
-        } catch (e) {
-            return false;
-        }
-    };
-    return (
-        <WidgetProvider mode="local" onFormSubmit={handleSubmit}>
-            <Main />
-        </WidgetProvider>
-    );
+  return (
+    <RoastnestProvider mode="self-hosted" projectId="your_project_id">
+      <YourMainApp />
+    </RoastnestProvider>
+  );
 }
 ```
 
-### Self-Host Example for Next.js
+---
+
+## Modes
+
+`@roastnest/react` operates in two modes:
+
+### Self-Hosted Mode
+Provides full offline capabilities, allowing you to completely handle submit and event tracking callbacks in your own codebase without sending any data to Roastnest servers.
+- **Provider setup**: `<RoastnestProvider mode="self-hosted" />`
+
+### Cloud Mode
+Hooks directly into Roastnest servers, automatically syncing feedback, uploads, screenshots, and referral conversions to your dashboard.
+- **Provider setup**: `<RoastnestProvider mode="cloud" projectId="your_project_id" />`
+
+---
+
+## Feedback Widget
+
+The feedback widget adds a floating action button on your page that triggers element selection, email collection, and feedback reporting.
+
+### Basic Setup
+
+Simply place the `<FeedbackWidget />` anywhere under the provider:
 
 ```tsx
-// app/RoastProvider.tsx
+import { FeedbackWidget } from "@roastnest/react";
 
-"use client";
-import WidgetProvider, { FormDataProps } from "react-roast";
-import { ReactNode } from "react";
-
-export default function RoastProvider({ children }: { children: ReactNode }) {
-    const handleSubmit = async ({ message, email, screenshotBlobs }: FormDataProps): Promise<boolean> => {
-        try {
-            // Send feedback data to your backend
-            // Or send to you channel (e.g., Slack, Discord)
-            return true;
-        } catch (e) {
-            return false;
-        }
-    };
-    return (
-        <WidgetProvider mode="local" onFormSubmit={handleSubmit}>
-            {children}
-        </WidgetProvider>
-    );
+function Layout() {
+  return (
+    <div>
+      <FeedbackWidget />
+    </div>
+  );
 }
 ```
+
+### useFeedback Hook
+Control the feedback overlay programmatically from any component.
 
 ```tsx
-// app/layout.tsx
+import { useFeedback } from "@roastnest/react";
 
-import RoastProvider from "./RoastProvider";
-import { ReactNode } from "react";
+function CustomButton() {
+  const { isFeedbackOpen, toggleFeedback, avoidElementClassName } = useFeedback();
 
-export default function RootLayout({ children }: { children: ReactNode }) {
-    return (
-        <html>
-            <body>
-                <RoastProvider>{children}</RoastProvider>
-            </body>
-        </html>
-    );
+  return (
+    <button onClick={toggleFeedback} className={avoidElementClassName}>
+      {isFeedbackOpen ? "Close Feedback" : "Submit Bug / Feedback"}
+    </button>
+  );
 }
 ```
 
-## Props
+### Feedback Customization Props
+Pass the `customize` object to customize the feedback form and notification bubbles.
 
-### Widget Provider Props
+| Property | Type | Description |
+|---|---|---|
+| `form.messageInput.placeholder` | `string` | Placeholder for the text area |
+| `form.submitButton.label` | `string` | Submit button label |
+| `notifications.enable` | `boolean` | Enable or disable periodic bottom notifications |
+| `notifications.messages` | `Array` | List of notification messages and types |
 
-| Property       | Type                | Description                                                                      |
-| -------------- | ------------------- | -------------------------------------------------------------------------------- |
-| `mode`         | `local` or `remote` | Defines if the widget operates locally or remotely                               |
-| `children`     | `ReactNode`         | Nested components inside the provider                                            |
-| `onFormSubmit` | `function`          | Callback for form submission. Returns a boolean for success/failure.             |
-| `customize`    | `object`            | Customization options for widget appearance, behavior, screenshots, and notices. |
-| `siteId`       | `string`            | Optional site identifier, useful for remote mode or multi-site setups.           |
-| `hideIsland`   | `boolean`           | Hide the floating trigger island while keeping the widget available via hooks.   |
+---
 
-### Widget Customize Props
+## Referral Widget
 
-Customize the widget by passing the `customize` prop with these options:
+The referral widget renders a sleek dashboard to refer friends and invite others using clipboard copy options or native share actions.
 
-| Property                                      | Type      | Description                                                                                 |
-| --------------------------------------------- | --------- | ------------------------------------------------------------------------------------------- |
-| `form.className`                              | `string`  | Custom CSS class for the form container                                                     |
-| `form.errorMessage`                           | `string`  | Error message shown when submission fails                                                   |
-| `form.successMessage`                         | `string`  | Success message shown when submission succeeds                                              |
-| `form.messageInput.className`                 | `string`  | Custom CSS class for the message input field                                                |
-| `form.messageInput.placeholder`               | `string`  | Placeholder text for the message input field                                                |
-| `form.submitButton.label`                     | `string`  | Label text for the submit button                                                            |
-| `form.submitButton.className`                 | `string`  | Custom CSS class for the submit button                                                      |
-| `form.cancelButton.label`                     | `string`  | Label text for the cancel button                                                            |
-| `form.cancelButton.className`                 | `string`  | Custom CSS class for the cancel button                                                      |
-| `form.output.excludeFullPageScreenshot`       | `boolean` | If `true`, skip capturing a full-page screenshot                                            |
-| `form.output.excludeSelectedElementScreenshot`| `boolean` | If `true`, skip capturing the selected-element screenshot                                   |
-| `island.mode`                                 | `string`  | Display mode for the island button (`default` = label + switch, `icon` = pointer icon only) |
-| `island.placement`                            | `string`  | Position of the island button (`left-center`, `right-bottom`, etc.)                         |
-| `island.className`                            | `string`  | Custom CSS class for the island button                                                      |
-| `island.label`                                | `string`  | Label text for the island button                                                            |
-| `island.switchButton.className`               | `string`  | Custom CSS class for the switch button inside the island                                    |
-| `island.switchButton.thumb.className`         | `string`  | Custom CSS class for the thumb of the switch button                                         |
-| `notifications.enable`                        | `boolean` | Enable or disable notifications                                                             |
-| `notifications.repeatDelay`                   | `number`  | Seconds to wait between showing notification messages                                       |
-| `notifications.displayDuration`               | `number`  | Seconds each notification stays visible                                                     |
-| `notifications.allowDismissal`                | `boolean` | Allow the user to dismiss notifications for the current session                             |
-| `notifications.allowParmanentDismissal`       | `boolean` | Allow the user to permanently dismiss notifications across sessions                         |
-| `notifications.paramanentDismissalExpiryDays` | `number`  | Number of days after which a permanent dismissal expires and notifications start again      |
-| `notifications.messages`                      | `array`   | Array of notification message objects                                                       |
-| `notifications.messages.type`                 | `string`  | Type of notification message (`info`, `hint`, `offer`, etc.)                                |
-| `notifications.messages.message`              | `string`  | Text content of the notification message                                                    |
-
-**Example usage:**
+### Basic Setup
 
 ```tsx
-<WidgetProvider
-    mode="local"
-    onFormSubmit={handleSubmit}
-    customize={{
-        form: {
-            className: "custom-form",
-            errorMessage: "Submission failed!",
-            successMessage: "Feedback sent!",
-            messageInput: {
-                className: "custom-input",
-                placeholder: "Type your feedback...",
-            },
-            submitButton: {
-                label: "Send",
-                className: "custom-submit",
-            },
-            cancelButton: {
-                label: "Cancel",
-                className: "custom-cancel",
-            },
-        },
-        island: {
-            placement: "right-center",
-            className: "custom-island",
-            label: "Roast",
-            switchButton: {
-                className: "custom-switch",
-                thumb: {
-                    className: "custom-thumb",
-                },
-            },
-        },
-        notifications: {
-            enable: true,
-            messages: [
-                { type: "info", message: "Feedback sent!" },
-                { type: "hint", message: "Something went wrong." },
-            ],
-        },
-    }}
->
-    <Main />
-</WidgetProvider>
-```
+import { ReferralWidget } from "@roastnest/react";
 
-### Default Customization
-
-The widget comes with sensible defaults. You can override any part using the `customize` prop.
-
-```typescript
-const defaultCustomize = {
-    form: {
-        messageInput: {
-            placeholder: "Don't be nice, Just Roast!",
-        },
-        submitButton: { label: "Roast it" },
-        cancelButton: { label: "Cancel" },
-        errorMessage: "Failed to submit message",
-        successMessage: "Message Submitted",
-        output: {
-            excludeFullPageScreenshot: false,
-            excludeSelectedElementScreenshot: false,
-        },
-    },
-    island: {
-        mode: "default",
-        label: "Roast Mode",
-        placement: "left-center",
-    },
-    notifications: {
-        enable: true,
-        repeatDelay: 15,
-        displayDuration: 5,
-        allowDismissal: true,
-        allowParmanentDismissal: false,
-        paramanentDismissalExpiryDays: 7,
-        messages: [
-            { message: "Feedback help us improve! Share your thoughts.", type: "info" },
-            { message: "Click here to share feedback with us.", type: "hint" },
-            { message: "Give feedback and get discounts!", type: "offer" },
-            { message: "You’ve earned discount! Redeem them now.", type: "reward" },
-            { message: "20+ Users love our product! Join them now.", type: "social" },
-            { message: "Last chance! discount ends in 2 days. Hurry up!", type: "urgent" },
-        ],
-    },
-};
-```
-
-### Form Data Props
-
-| Property          | Type                | Description                            |
-| ----------------- | ------------------- | -------------------------------------- |
-| `email`           | `string` (optional) | The user's email address, if provided. |
-| `message`         | `string`            | The message input by the user.         |
-| `screenshotBlobs` | `ScreenshotBlobs`   | Array of screenshot blobs (see below). |
-
-**ScreenshotBlobs structure:**
-
-```typescript
-// ScreenshotBlobs type
-Array<{
-    blob: Blob;
-    type: "full-screenshot" | "selected-screenshot";
-}>;
-```
-
--   `blob`: The captured screenshot as a Blob object.
--   `type`: Indicates if the screenshot is of the full page or a selected element.
-
-**Example FormDataProps usage:**
-
-```typescript
-interface FormDataProps {
-    email?: string;
-    message: string;
-    screenshotBlobs: ScreenshotBlobs;
+function InvitePage() {
+  return (
+    <ReferralWidget
+      referralLink="https://myapp.com/invite"
+      appName="My Awesome App"
+      rewardAmount="$20"
+      onEvent={(payload) => console.log("Referral Event:", payload)}
+    />
+  );
 }
 ```
 
-## Hooks
+### Auto-generated Referral Links & Validation
 
-### useReactRoast
+> [!IMPORTANT]
+> The SDK automatically generates a secure unique referral code for each user and stores it persistently in the browser's `localStorage` (e.g. `roastnest_my_referral_code`).
 
-The `useReactRoast` hook provides imperative control and utility functions for the widget. Use it inside your components to interact with the widget programmatically.
+- **Auto-Appending Parameter**: When you provide `referralLink="https://myapp.com/invite"`, the SDK will automatically append the generated referral code as a query param (e.g., `https://myapp.com/invite?ref=AYUSH123`).
+- **Domain Matching**: For safety, the domain of the `referralLink` must match `window.location.hostname`. If they do not match, the widget will log a `console.error` and degrade gracefully by returning `null` to avoid breaking the user's webpage.
 
-**Returned values:**
-
-| Property                | Type       | Description                                       |
-| ----------------------- | ---------- | ------------------------------------------------- |
-| `isWidgetActive`        | `boolean`  | Whether the widget is currently active            |
-| `toggleWidget`          | `function` | Toggle the widget's active state                  |
-| `avoidElementClassName` | `string`   | CSS class name to exclude elements from selection |
-| `setIslandVisiblity`    | `function` | Show or hide the widget island button             |
-| `setUser`               | `function` | Set or update the user data                       |
-
-**Usage Example:**
+### useReferral Hook & Conversion Tracking
+To track successful referral conversions (e.g., a friend signed up, subscribed, or performed an action), use the headless hook `useReferral`:
 
 ```tsx
-import { useReactRoast } from "react-roast";
+import React, { useEffect } from "react";
+import { useReferral } from "@roastnest/react";
 
-function WidgetControls() {
-    const { isWidgetActive, toggleWidget, setIslandVisiblity, setUser } = useReactRoast();
+export function SignupSuccessPage() {
+  const { trackConversion, referralCode, hasReferral } = useReferral();
 
-    return (
-        <div>
-            <button onClick={toggleWidget}>{isWidgetActive ? "Deactivate" : "Activate"} Widget</button>
-            <button onClick={() => setIslandVisiblity(false)}>Hide Island</button>
-            <button onClick={() => setUser({ email: "user@example.com" })}>Set User</button>
-        </div>
-    );
+  useEffect(() => {
+    if (hasReferral) {
+      // Trigger a conversion event
+      trackConversion({ event: "signup" });
+    }
+  }, [hasReferral]);
+
+  return <h1>Thank you for signing up! (Referral Code Detected: {referralCode})</h1>;
 }
 ```
 
-## Contribution
+### Referral Lifecycle Visualizer
+The SDK contains a built-in visualizer to simulate and test your referral lifecycle stages (Shared -> Clicked -> Saved -> Action -> Attributed -> Reward Approved).
 
-Contributions are welcome! If you would like to improve React Roast, please follow these steps:
+```tsx
+import { ReferralLifecycle } from "@roastnest/react";
 
-1. Fork the repository.
-2. Create a new branch for your feature or fix.
-3. Make changes and commit them.
-4. Submit a pull request.
+function DebugPanel() {
+  return (
+    <div style={{ padding: 20, border: "1px dashed gray" }}>
+      <h3>Test Referral Stages Simulator</h3>
+      <ReferralLifecycle />
+    </div>
+  );
+}
+```
 
-Please ensure your contributions align with the project’s coding standards and best practices. If you want help, [contact here](https://x.com/satyamskillz)
+---
 
 ## License
 
-MIT License.
+MIT © [RoastNest](https://roastnest.com)
