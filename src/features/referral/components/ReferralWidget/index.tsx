@@ -1,4 +1,5 @@
 import React, { useEffect, useContext } from "react";
+import config from "../../../../core/config/config";
 import { RoastnestContext } from "../../../../core/context";
 import { ReferrerIdentity, ReferralWidgetProps } from "./types";
 import { DEFAULT_WIDGET_PROPS } from "./defaults";
@@ -9,6 +10,7 @@ import { ReferralAPI } from "../../ReferralAPI";
 import ReferralButton from "../ReferralButton";
 import ReferralPopup from "../ReferralPopup";
 import ReferralCard from "../ReferralCard";
+import ApiInstance from "../../../../shared/utils/api";
 
 export const ReferralWidget: React.FC<ReferralWidgetProps> = (userProps) => {
 	const context = useContext(RoastnestContext);
@@ -35,10 +37,6 @@ export const ReferralWidget: React.FC<ReferralWidgetProps> = (userProps) => {
 
 	const finalReferrerIdentity = userProps.referrerIdentity || hookIdentity;
 
-	const referrerIdentityStr = finalReferrerIdentity
-		? JSON.stringify(finalReferrerIdentity)
-		: "";
-
 	useEffect(() => {
 		if (mode === "cloud" && effectiveProjectId) {
 			const api = ReferralAPI.create({
@@ -49,12 +47,9 @@ export const ReferralWidget: React.FC<ReferralWidgetProps> = (userProps) => {
 			const visitorId = api.getVisitorId();
 
 			setIsLoadingCloud(true);
-			const identityQuery = referrerIdentityStr ? `&identity=${encodeURIComponent(referrerIdentityStr)}` : "";
-			fetch(`https://api.roastnest.com/referrals/setup?projectId=${effectiveProjectId}&visitorId=${visitorId}${identityQuery}`)
-				.then((res) => {
-					if (!res.ok) throw new Error("Failed to fetch referral setup");
-					return res.json();
-				})
+			
+			const apiInstance = new ApiInstance({ siteId: effectiveProjectId });
+			apiInstance.getReferralSetup({ visitorId, identity: finalReferrerIdentity })
 				.then((data) => {
 					setCloudData(data);
 				})
@@ -65,7 +60,7 @@ export const ReferralWidget: React.FC<ReferralWidgetProps> = (userProps) => {
 					setIsLoadingCloud(false);
 				});
 		}
-	}, [mode, effectiveProjectId, referrerIdentityStr]);
+	}, [mode, effectiveProjectId, finalReferrerIdentity]);
 
 	if (mode === "cloud" && !effectiveProjectId) {
 		console.error("Roastnest Referral SDK: projectId is required via RoastnestProvider in cloud mode");

@@ -56,10 +56,10 @@ export function FeedbackProvider({
 
     const setElementHoverable = (isHoverable: boolean) => {
         if (isHoverable) {
-            document.body.dataset.roastActive = "true";
+            document.body.dataset.feedbackActive = "true";
             document.body.style.cursor = "crosshair";
         } else {
-            delete document.body.dataset.roastActive;
+            delete document.body.dataset.feedbackActive;
             document.body.style.cursor = "default";
         }
     };

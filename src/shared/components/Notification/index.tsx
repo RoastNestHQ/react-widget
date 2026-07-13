@@ -28,7 +28,7 @@ const Notification: React.FC = () => {
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
     const [isVisible, setIsVisible] = useState(false);
 
-    // Roast widget context
+    // Feedback widget context
     const { customize, active, triggerButtonHidden } = useFeedbackContext();
 
     // Do not render if triggerButton is hidden

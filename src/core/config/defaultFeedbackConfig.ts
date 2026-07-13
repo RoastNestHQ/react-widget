@@ -3,9 +3,9 @@ import { FeedbackCustomizeProps } from "../../features/feedback/types";
 const defaultFeedbackConfig: FeedbackCustomizeProps = {
     form: {
         messageInput: {
-            placeholder: "Don't be nice, Just Roast!",
+            placeholder: "Leave your Feedback!",
         },
-        submitButton: { label: "Roast it" },
+        submitButton: { label: "Send Feedback" },
         cancelButton: { label: "Cancel" },
         errorMessage: "Failed to submit message",
         successMessage: "Message Submitted",
@@ -16,7 +16,7 @@ const defaultFeedbackConfig: FeedbackCustomizeProps = {
     },
     triggerButton: {
         mode: "default",
-        label: "Roast Mode",
+        label: "Feedback Mode",
         placement: "left-center",
     },
     notifications: {

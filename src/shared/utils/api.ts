@@ -10,7 +10,7 @@ interface UploadImageToS3Props {
 	imageBlob: Blob | null; // Image blob to be uploaded
 }
 
-interface RoastToDBProps {
+interface FeedbackToDBProps {
 	user?: User; // Optional user data for tracking or rewards
 	message: string; // Message to be sent
 	screenshots: Array<{
@@ -20,7 +20,7 @@ interface RoastToDBProps {
 	}>;
 }
 
-interface SendRoastProps {
+interface SendFeedbackProps {
 	message: string; // Message to be sent
 	user?: User; // Optional user data for tracking or rewards
 	screenshotBlobs: ScreenshotBlobs; // Array of screenshot blobs
@@ -98,7 +98,7 @@ class ApiInstance {
 		});
 	}
 
-	private async submitRoastToDB(props: RoastToDBProps) {
+	private async submitFeedbackToDB(props: FeedbackToDBProps) {
 		return this.retry(async (_attempt, _retries) => {
 			const { message, screenshots, user } = props;
 
@@ -164,7 +164,7 @@ class ApiInstance {
 				}),
 			});
 
-			if (!response.ok) throw new Error("Error submitting roast to DB");
+			if (!response.ok) throw new Error("Error submitting feedback to DB");
 
 			const responseData = await response.json();
 
@@ -175,7 +175,7 @@ class ApiInstance {
 		});
 	}
 
-	async sendRoast({ message, user, screenshotBlobs }: SendRoastProps) {
+	async sendFeedback({ message, user, screenshotBlobs }: SendFeedbackProps) {
 		try {
 			let screenshots = [];
 
@@ -202,20 +202,71 @@ class ApiInstance {
 				});
 			}
 
-			// Submit the roast to the database
-			const response = await this.submitRoastToDB({ message, user, screenshots });
+			// Submit the feedback to the database
+			const response = await this.submitFeedbackToDB({ message, user, screenshots });
 
 			return {
 				trackingUrl: response.trackingUrl,
-				message: "Roasted successfully!",
+				message: "Feedback sent successfully!",
 				success: true,
 			};
 		} catch (error) {
 			return {
-				message: "Failed to roast, try again!",
+				message: "Failed to send feedback, try again!",
 				success: false,
 			};
 		}
+	}
+
+	async getWidgetConfig() {
+		return this.retry(async () => {
+			const response = await fetch(`${webhookAPI}/v1/widgets/config`, {
+				method: "POST",
+				headers: {
+					"X-Site-Code": this.siteId,
+				},
+			});
+
+			if (!response.ok) throw new Error("Error getting widget config");
+
+			return response.json();
+		});
+	}
+
+	async getReferralSetup(payload: { visitorId: string; identity?: any }) {
+		return this.retry(async () => {
+			const response = await fetch(`${webhookAPI}/v1/referrals/setup`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					"X-Site-Code": this.siteId,
+				},
+				body: JSON.stringify(payload)
+			});
+
+			if (!response.ok) throw new Error("Error getting referral setup");
+
+			return response.json();
+		});
+	}
+
+	async postReferralEvent(payload: any) {
+		return this.retry(async () => {
+			const response = await fetch(`${webhookAPI}/v1/referrals/events`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					"X-Site-Code": this.siteId,
+				},
+				body: JSON.stringify(payload),
+			});
+
+			if (!response.ok) throw new Error(`Error posting referral event: ${response.statusText}`);
+			
+			// Some webhook responses might be empty
+			const text = await response.text();
+			return text ? JSON.parse(text) : { success: true };
+		});
 	}
 }
 

@@ -60,7 +60,7 @@ const FeedbackForm: React.FC = () => {
 
         setLoading(true);
         const api = new ApiInstance({ siteId: projectId });
-        const response = await api.sendRoast({ message, user, screenshotBlobs });
+        const response = await api.sendFeedback({ message, user, screenshotBlobs });
 
         if (response.success) {
             setMessage("");

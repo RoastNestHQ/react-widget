@@ -11,15 +11,15 @@
 	--rrn-clr-900: hsl(15, 50%, 3%);
 }
 
-/* when roast widget is active, highlight the element */
-[data-roast-active="true"] {
+/* when feedback widget is active, highlight the element */
+[data-feedback-active="true"] {
 	*:hover:not(:has(*:hover)) {
 		outline: 2px dashed red;
 	}
 }
 
-/* when roast widget is active, avoid element will not be highlighted */
-[data-roast-active="true"] .rrn-global-avoid-element {
+/* when feedback widget is active, avoid element will not be highlighted */
+[data-feedback-active="true"] .rrn-global-avoid-element {
 	outline: none !important;
 	* {
 		outline: none !important;
