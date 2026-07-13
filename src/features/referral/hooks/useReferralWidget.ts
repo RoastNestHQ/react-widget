@@ -22,7 +22,7 @@ export function useReferralWidget(props: ReferralWidgetProps & { projectId: stri
     try {
       await navigator.clipboard.writeText(props.referralLink);
       setLinkCopied(true);
-      props.onLinkCopied?.(props.referralLink, props.projectId!);
+      props.onLinkCopied?.(props.referralLink, props.projectId!, props.referrerIdentity);
       setTimeout(() => setLinkCopied(false), props.copySuccessDuration || 2000);
     } catch (err) {
       console.error("Failed to copy link", err);
@@ -30,7 +30,7 @@ export function useReferralWidget(props: ReferralWidgetProps & { projectId: stri
   }, [props.referralLink, props.projectId, props.onLinkCopied, props.copySuccessDuration]);
 
   const share = useCallback(async () => {
-    props.onShare?.(props.projectId!);
+    props.onShare?.(props.projectId!, props.referrerIdentity);
     
     const text = props.shareMessage || `Join me on ${props.appName || 'this app'}!`;
     const shareData = {

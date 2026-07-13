@@ -10,12 +10,13 @@ interface ReferralCardProps extends BaseReferralWidgetProps {
 	onCopyLink: () => void;
 	onShare: () => void;
 	referralLink?: string;
+	rewardAmount?: string;
 }
 
 const ReferralCard: React.FC<ReferralCardProps> = ({
 	appName,
 	appIcon,
-	referrerName,
+	referrerIdentity,
 	rewardAmount,
 	rewardDescription,
 	referralLink,
@@ -42,9 +43,9 @@ const ReferralCard: React.FC<ReferralCardProps> = ({
 			</div>
 
 			<p className={CLASS_NAMES.referral.message} style={styles.mutedText}>
-				{referrerName ? (
+				{referrerIdentity?.name ? (
 					<>
-						Hi <span style={styles.link}>{referrerName}</span>, invite your friends to
+						Hi <span style={styles.link}>{referrerIdentity.name}</span>, invite your friends to
 						earn!
 					</>
 				) : (
@@ -66,15 +67,19 @@ const ReferralCard: React.FC<ReferralCardProps> = ({
 			{showReferralLink && (
 				<div className={CLASS_NAMES.referral.copyBlock}>
 					<div className={CLASS_NAMES.referral.copyLabel}>{referralLinkLabel}</div>
-					<div className={CLASS_NAMES.referral.copyContent} style={styles.codeBox}>
-						<span className={CLASS_NAMES.referral.linkText}>{referralLink}</span>
-						<button
-							className={`${CLASS_NAMES.referral.actionBtn} ${linkCopied ? CLASS_NAMES.referral.copied : ""}`}
-							style={linkCopied ? styles.copyBtnSuccess : styles.outlineBtn}
-							onClick={onCopyLink}
-						>
-							{linkCopied ? copySuccessLabel : "Copy"}
-						</button>
+					<div 
+						className={CLASS_NAMES.referral.copyContent} 
+						style={{ ...styles.codeBox, cursor: "pointer" }}
+						onClick={onCopyLink}
+						title="Click to copy link"
+					>
+						<span className={CLASS_NAMES.referral.linkText}>
+							{linkCopied ? (
+								<span style={{ color: "#10b981", fontWeight: 600 }}>{copySuccessLabel}</span>
+							) : (
+								referralLink
+							)}
+						</span>
 					</div>
 				</div>
 			)}

@@ -1,4 +1,4 @@
-import { ReferralConfig, ReferralData, ConversionEvent, QueuedEvent, ReferralEventPayload } from "./components/ReferralWidget/types";
+import { ReferralConfig, ReferralData, ConversionEvent, QueuedEvent, ReferralEventPayload, ReferrerIdentity } from "./components/ReferralWidget/types";
 import { ReferralDetector } from "./core/ReferralDetector";
 import { ReferralStorage } from "./core/ReferralStorage";
 import { VisitorManager } from "./core/VisitorManager";
@@ -25,10 +25,11 @@ export class ReferralAPI {
   private sessionMgr: SessionManager;
   private queue: EventQueue;
   private transport: ITransport;
+  private referrerIdentity: ReferrerIdentity | undefined;
 
   constructor(config: ReferralConfig, deps: ReferralAPIDependencies) {
-    if (!config.projectId) {
-      throw new Error("Roastnest Referral SDK: projectId is required");
+    if (config.mode === "cloud" && !config.projectId) {
+      throw new Error("Roastnest Referral SDK: projectId is required in cloud mode");
     }
     this.config = config;
     this.detector = deps.detector;
@@ -43,8 +44,8 @@ export class ReferralAPI {
    * Factory method to create an instance with all its dependencies.
    */
   static create(config: ReferralConfig): ReferralAPI {
-    if (!config.projectId) {
-      throw new Error("Roastnest Referral SDK: projectId is required");
+    if (config.mode === "cloud" && !config.projectId) {
+      throw new Error("Roastnest Referral SDK: projectId is required in cloud mode");
     }
 
     const transport = config.mode === "self-hosted"
@@ -146,11 +147,22 @@ export class ReferralAPI {
     return this.config;
   }
 
+  getReferrerIdentity(): ReferrerIdentity | undefined {
+    return this.referrerIdentity;
+  }
+
+  setReferrerIdentity(identity: ReferrerIdentity | undefined): void {
+    this.referrerIdentity = identity;
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent('roastnest-identity-updated', { detail: identity }));
+    }
+  }
+
   /**
    * Returns the configured project ID.
    */
   getProjectId(): string {
-    return this.config.projectId;
+    return this.config.projectId || "";
   }
 
   /**
@@ -163,7 +175,7 @@ export class ReferralAPI {
     if (!refData || !refData.code) return;
 
     const payload: ReferralEventPayload = {
-      projectId: this.config.projectId,
+      projectId: this.config.projectId || "",
       referralCode: refData?.code || "",
       event: event.event,
       value: event.value,

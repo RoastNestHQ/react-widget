@@ -48,8 +48,8 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = (props) => {
         throw new Error("FeedbackWidget must be used within a RoastnestProvider");
     }
 
-    if (!effectiveProjectId) {
-        console.error("Roastnest Feedback SDK: projectId is required via RoastnestProvider");
+    if (mode === "cloud" && !effectiveProjectId) {
+        console.error("Roastnest Feedback SDK: projectId is required via RoastnestProvider in cloud mode");
         return null;
     }
 

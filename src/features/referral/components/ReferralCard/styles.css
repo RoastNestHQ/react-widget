@@ -100,10 +100,6 @@
   cursor: pointer;
 }
 
-.rrn-referral-link-text:hover {
-  white-space: normal;
-  word-break: break-all;
-}
 
 .rrn-referral-action-btn {
   background: #f0f0f0;

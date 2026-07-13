@@ -1,6 +1,6 @@
 import React, { useEffect, useContext } from "react";
 import { RoastnestContext } from "../../../../core/context";
-import { ReferralWidgetProps } from "./types";
+import { ReferrerIdentity, ReferralWidgetProps } from "./types";
 import { DEFAULT_WIDGET_PROPS } from "./defaults";
 import { buildStyles } from "./styles";
 import { useReferralWidget } from "../../hooks/useReferralWidget";
@@ -17,6 +17,27 @@ export const ReferralWidget: React.FC<ReferralWidgetProps> = (userProps) => {
 
 	const [cloudData, setCloudData] = React.useState<any>(null);
 	const [isLoadingCloud, setIsLoadingCloud] = React.useState(mode === "cloud");
+	const [hookIdentity, setHookIdentity] = React.useState<ReferrerIdentity | undefined>(undefined);
+
+	useEffect(() => {
+		const handleIdentityUpdate = (e: CustomEvent<ReferrerIdentity | undefined>) => {
+			setHookIdentity(e.detail);
+		};
+		if (typeof window !== "undefined") {
+			window.addEventListener('roastnest-identity-updated', handleIdentityUpdate as EventListener);
+		}
+		return () => {
+			if (typeof window !== "undefined") {
+				window.removeEventListener('roastnest-identity-updated', handleIdentityUpdate as EventListener);
+			}
+		};
+	}, []);
+
+	const finalReferrerIdentity = userProps.referrerIdentity || hookIdentity;
+
+	const referrerIdentityStr = finalReferrerIdentity
+		? JSON.stringify(finalReferrerIdentity)
+		: "";
 
 	useEffect(() => {
 		if (mode === "cloud" && effectiveProjectId) {
@@ -28,7 +49,8 @@ export const ReferralWidget: React.FC<ReferralWidgetProps> = (userProps) => {
 			const visitorId = api.getVisitorId();
 
 			setIsLoadingCloud(true);
-			fetch(`https://api.roastnest.com/referrals/setup?projectId=${effectiveProjectId}&visitorId=${visitorId}`)
+			const identityQuery = referrerIdentityStr ? `&identity=${encodeURIComponent(referrerIdentityStr)}` : "";
+			fetch(`https://api.roastnest.com/referrals/setup?projectId=${effectiveProjectId}&visitorId=${visitorId}${identityQuery}`)
 				.then((res) => {
 					if (!res.ok) throw new Error("Failed to fetch referral setup");
 					return res.json();
@@ -43,10 +65,10 @@ export const ReferralWidget: React.FC<ReferralWidgetProps> = (userProps) => {
 					setIsLoadingCloud(false);
 				});
 		}
-	}, [mode, effectiveProjectId]);
+	}, [mode, effectiveProjectId, referrerIdentityStr]);
 
-	if (!effectiveProjectId) {
-		console.error("Roastnest Referral SDK: projectId is required via RoastnestProvider");
+	if (mode === "cloud" && !effectiveProjectId) {
+		console.error("Roastnest Referral SDK: projectId is required via RoastnestProvider in cloud mode");
 		return null;
 	}
 
@@ -70,6 +92,7 @@ export const ReferralWidget: React.FC<ReferralWidgetProps> = (userProps) => {
 		if (!finalCode) {
 			finalCode = Math.random().toString(36).substring(2, 10).toUpperCase();
 			localStorage.setItem("roastnest_my_referral_code", finalCode);
+			userProps.onReferralCreated?.(finalCode, finalReferrerIdentity);
 		}
 
 		if (!userProps.referralLink) {
@@ -89,6 +112,12 @@ export const ReferralWidget: React.FC<ReferralWidgetProps> = (userProps) => {
 						hasError = true;
 					} else {
 						url.searchParams.set("ref", finalCode);
+						if (finalReferrerIdentity) {
+							url.searchParams.set("refId", finalReferrerIdentity.id);
+							url.searchParams.set("refName", finalReferrerIdentity.name);
+							if (finalReferrerIdentity.email) url.searchParams.set("refEmail", finalReferrerIdentity.email);
+							if (finalReferrerIdentity.phone) url.searchParams.set("refPhone", finalReferrerIdentity.phone);
+						}
 						finalLink = url.toString() as `http://${string}` | `https://${string}`;
 					}
 				} catch (err: any) {
@@ -104,6 +133,11 @@ export const ReferralWidget: React.FC<ReferralWidgetProps> = (userProps) => {
 			console.error("Roastnest Referral SDK: onEvent callback is required in self-hosted mode to track conversions.");
 			hasError = true;
 		}
+
+		if (!userProps.rewardAmount) {
+			console.error("Roastnest Referral SDK: rewardAmount is required in self-hosted mode.");
+			hasError = true;
+		}
 	}
 
 	if (hasError) {
@@ -115,6 +149,7 @@ export const ReferralWidget: React.FC<ReferralWidgetProps> = (userProps) => {
 		...userProps,
 		...(mode === "cloud" ? cloudData : {}),
 		projectId: effectiveProjectId,
+		referrerIdentity: finalReferrerIdentity,
 		referralCode: finalCode,
 		referralLink: finalLink,
 	} as ReferralWidgetProps & { projectId: string; referralCode: string; referralLink: string; onEvent?: any };
