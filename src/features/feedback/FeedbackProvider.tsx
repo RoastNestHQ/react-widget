@@ -7,7 +7,7 @@ import { FeedbackContext } from "./context";
 import { ToastProvider } from "../../shared/components/Toaster";
 
 import { CLASS_NAMES } from '../../utils/classNames';
-import defaultFeedbackConfig from "../../core/config/defaultFeedbackConfig";
+import { DEFAULT_FEEDBACK_CONFIG } from "./defaults";
 
 const initialSelectedValue: SelectedElement = {
     position: { x: 0, y: 0 },
@@ -77,11 +77,11 @@ export function FeedbackProvider({
 
         const excludeFullPageScreenshot =
             customize?.form?.output?.excludeFullPageScreenshot ||
-            defaultFeedbackConfig?.form?.output?.excludeFullPageScreenshot ||
+            DEFAULT_FEEDBACK_CONFIG?.form?.output?.excludeFullPageScreenshot ||
             false;
         const excludeSelectedElementScreenshot =
             customize?.form?.output?.excludeSelectedElementScreenshot ||
-            defaultFeedbackConfig?.form?.output?.excludeSelectedElementScreenshot ||
+            DEFAULT_FEEDBACK_CONFIG?.form?.output?.excludeSelectedElementScreenshot ||
             false;
 
         const targetAttr = "data-screenshot-target";

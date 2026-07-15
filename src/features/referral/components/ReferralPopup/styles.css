@@ -24,12 +24,24 @@
 
 .rrn-referral-modal {
 	position: relative;
-	background-color: #ffffff;
-	border-radius: 16px;
+	background-color: var(--rrn-ref-bg, #ffffff);
+	color: var(--rrn-ref-text, #1a1a1a);
+	border-radius: var(--rrn-ref-radius, 16px);
+	font-family: var(
+		--rrn-ref-font,
+		-apple-system,
+		BlinkMacSystemFont,
+		"Segoe UI",
+		Roboto,
+		Helvetica,
+		Arial,
+		sans-serif
+	);
+	border: 1px solid var(--rrn-ref-border, transparent);
 	width: 90%;
 	max-width: 400px;
 	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-	padding: 32px 24px;
+	padding: 24px 24px;
 	transform: translateY(20px) scale(0.95);
 	transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }

@@ -6,8 +6,7 @@ interface ReferralPopupProps {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
-  backdropStyle?: React.CSSProperties;
-  popupStyle?: React.CSSProperties;
+  style?: React.CSSProperties;
   closeOnBackdropClick?: boolean;
 }
 
@@ -15,8 +14,7 @@ const ReferralPopup: React.FC<ReferralPopupProps> = ({
   isOpen, 
   onClose, 
   children,
-  backdropStyle,
-  popupStyle,
+  style,
   closeOnBackdropClick = true
 }) => {
   const [shouldRender, setShouldRender] = useState(isOpen);
@@ -35,13 +33,12 @@ const ReferralPopup: React.FC<ReferralPopupProps> = ({
   return (
     <div 
       className={`${CLASS_NAMES.referral.backdrop} ${isOpen ? CLASS_NAMES.global.open : CLASS_NAMES.global.closed}`} 
-      style={backdropStyle}
+      style={style}
       onClick={closeOnBackdropClick ? onClose : undefined}
       data-html2canvas-ignore="true"
     >
       <div 
         className={`${CLASS_NAMES.referral.modal} ${isOpen ? CLASS_NAMES.global.open : CLASS_NAMES.global.closed}`} 
-        style={popupStyle}
         onClick={(e) => e.stopPropagation()}
       >
         <button className={CLASS_NAMES.referral.close} onClick={onClose} aria-label="Close popup">

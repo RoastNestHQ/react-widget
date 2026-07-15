@@ -1,59 +1,28 @@
 import React from "react";
-import { ReferralTheme } from "./types";
+import { WidgetTheme } from "../../../../shared/types";
 import { DEFAULT_WIDGET_PROPS } from "./defaults";
 
-export type StyleMap = {
-  popup: React.CSSProperties;
-  codeBox: React.CSSProperties;
-  copyBtnSuccess: React.CSSProperties;
-  primaryBtn: React.CSSProperties;
-  outlineBtn: React.CSSProperties;
-  link: React.CSSProperties;
-  mutedText: React.CSSProperties;
-  backdrop: React.CSSProperties;
-};
-
-export function buildStyles(theme?: ReferralTheme): StyleMap {
+export function buildThemeVars(theme?: WidgetTheme): React.CSSProperties {
   const t = { ...DEFAULT_WIDGET_PROPS.theme, ...theme };
 
   return {
-    popup: {
-      backgroundColor: t.backgroundColor,
-      color: t.textColor,
-      borderRadius: t.borderRadius,
-      fontFamily: t.fontFamily,
-      boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
-      border: `1px solid ${t.borderColor}`,
-    },
-    codeBox: {
-      backgroundColor: t.codeBoxColor,
-      color: t.textColor,
-      borderRadius: "6px",
-      border: `1px solid ${t.borderColor}`,
-    },
-    copyBtnSuccess: {
-      backgroundColor: t.successColor,
-      color: "#ffffff",
-    },
-    primaryBtn: {
-      backgroundColor: t.primaryColor,
-      color: "#ffffff",
-      borderRadius: "6px",
-    },
-    outlineBtn: {
-      backgroundColor: "transparent",
-      color: t.textColor,
-      border: `1px solid ${t.borderColor}`,
-      borderRadius: "6px",
-    },
-    link: {
-      color: t.accentColor,
-    },
-    mutedText: {
-      color: t.mutedTextColor,
-    },
-    backdrop: {
-      backgroundColor: "rgba(0, 0, 0, 0.4)", // or backdropColor
-    },
-  };
+    "--rrn-ref-primary": t.primaryColor,
+    "--rrn-ref-bg": t.backgroundColor,
+    "--rrn-ref-text": t.textColor,
+    "--rrn-ref-muted": t.mutedTextColor,
+    "--rrn-ref-accent": t.accentColor,
+    "--rrn-ref-border": t.borderColor,
+    "--rrn-ref-code": t.codeBoxColor,
+    "--rrn-ref-success": t.successColor,
+    "--rrn-ref-radius": t.borderRadius,
+    "--rrn-ref-font": t.fontFamily,
+    // Add global feedback variables
+    "--rrn-clr-primary": t.primaryColor,
+    "--rrn-clr-50": t.backgroundColor,
+    "--rrn-clr-900": t.textColor,
+    "--rrn-clr-600": t.mutedTextColor,
+    "--rrn-clr-200": t.borderColor,
+    "--rrn-clr-radius": t.borderRadius,
+    "--rrn-clr-font": t.fontFamily,
+  } as React.CSSProperties;
 }

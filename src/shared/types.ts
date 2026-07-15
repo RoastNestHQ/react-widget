@@ -40,10 +40,24 @@ export interface FormDataProps {
 
 
 
+export interface WidgetTheme {
+    primaryColor?: string;
+    accentColor?: string;
+    successColor?: string;
+    backgroundColor?: string;
+    textColor?: string;
+    mutedTextColor?: string;
+    borderColor?: string;
+    codeBoxColor?: string;
+    borderRadius?: string;
+    fontFamily?: string;
+}
+
 export interface RoastnestContextType {
     mode?: "self-hosted" | "cloud";
     userData?: User;
     projectId?: string;
+    theme?: WidgetTheme;
     setUser: (user: User) => void;
 }
 
@@ -56,11 +70,13 @@ export interface BaseRoastnestProviderProps {
 export interface LocalRoastnestProviderProps extends BaseRoastnestProviderProps {
     mode: "self-hosted";
     projectId?: string;
+    theme?: WidgetTheme;
 }
 
 export interface RemoteRoastnestProviderProps extends BaseRoastnestProviderProps {
     projectId: string;
     mode?: "cloud";
+    theme?: WidgetTheme;
 }
 
 export type RoastnestProviderProps = LocalRoastnestProviderProps | RemoteRoastnestProviderProps;

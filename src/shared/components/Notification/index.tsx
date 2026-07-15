@@ -1,6 +1,6 @@
 import { CLASS_NAMES } from '../../../utils/classNames';
 import { autoPlacement, autoUpdate, offset, shift, useFloating, Placement } from "@floating-ui/react";
-import defaultFeedbackConfig from "../../../core/config/defaultFeedbackConfig";
+import { DEFAULT_FEEDBACK_CONFIG } from "../../../features/feedback/defaults";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { NotificationMessage } from "../../../features/feedback/types";
 import useFeedbackContext from "../../../features/feedback/hooks/useFeedbackContext";
@@ -35,14 +35,14 @@ const Notification: React.FC = () => {
     if (triggerButtonHidden) return null;
 
     // Use customized messages or default ones
-    const messages = customize?.notifications?.messages ?? defaultFeedbackConfig.notifications?.messages;
-    const repeatDelay = customize?.notifications?.repeatDelay ?? defaultFeedbackConfig?.notifications?.repeatDelay ?? 15;
+    const messages = customize?.notifications?.messages || DEFAULT_FEEDBACK_CONFIG?.notifications?.messages || [];
+    const repeatDelay = customize?.notifications?.repeatDelay ?? DEFAULT_FEEDBACK_CONFIG?.notifications?.repeatDelay ?? 15;
     const displayDuration =
-        customize?.notifications?.displayDuration ?? defaultFeedbackConfig.notifications?.displayDuration ?? 5;
+        customize?.notifications?.displayDuration ?? DEFAULT_FEEDBACK_CONFIG?.notifications?.displayDuration ?? 5;
 
     const parmanentDismissalExpiryDays =
         customize?.notifications?.paramanentDismissalExpiryDays ??
-        defaultFeedbackConfig?.notifications?.paramanentDismissalExpiryDays ??
+        DEFAULT_FEEDBACK_CONFIG?.notifications?.paramanentDismissalExpiryDays ??
         dismissalExpiryDays;
 
     // Set reference element for floating UI

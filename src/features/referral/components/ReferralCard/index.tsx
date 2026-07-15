@@ -1,11 +1,9 @@
 import { CLASS_NAMES } from "../../../../utils/classNames";
 import React from "react";
 import "./styles.css";
-import { StyleMap } from "../ReferralWidget/styles";
 import { BaseReferralWidgetProps } from "../ReferralWidget/types";
 
 interface ReferralCardProps extends BaseReferralWidgetProps {
-	styles: StyleMap;
 	linkCopied: boolean;
 	onCopyLink: () => void;
 	onShare: () => void;
@@ -18,10 +16,13 @@ const ReferralCard: React.FC<ReferralCardProps> = ({
 	appIcon,
 	referrerIdentity,
 	rewardAmount,
+	referrerRewardAmount,
+	refereeRewardAmount,
+	referrerRewardType,
+	refereeRewardType,
 	rewardDescription,
 	referralLink,
 	expiryHours,
-	styles,
 	linkCopied,
 	onCopyLink,
 	onShare,
@@ -37,45 +38,50 @@ const ReferralCard: React.FC<ReferralCardProps> = ({
 		<div className={CLASS_NAMES.referral.card}>
 			<div className={CLASS_NAMES.referral.header}>
 				{appIcon && <div className={CLASS_NAMES.referral.appIcon}>{appIcon}</div>}
-				<h2 className={CLASS_NAMES.referral.appName} style={styles.mutedText}>
+				<h2 className={CLASS_NAMES.referral.appName}>
 					{appName}
 				</h2>
 			</div>
+			<div className={CLASS_NAMES.referral.content}>
+				<p className={CLASS_NAMES.referral.message}>
+					{referrerIdentity?.name ? (
+						<>
+							Hi <span>{referrerIdentity.name}</span>, invite your
+							friends to earn!
+						</>
+					) : (
+						<>
+							Invite your friends to <span>earn</span>!
+						</>
+					)}
+				</p>
 
-			<p className={CLASS_NAMES.referral.message} style={styles.mutedText}>
-				{referrerIdentity?.name ? (
-					<>
-						Hi <span style={styles.link}>{referrerIdentity.name}</span>, invite your friends to
-						earn!
-					</>
-				) : (
-					<>
-						Invite your friends to <span style={styles.link}>earn</span>!
-					</>
-				)}
-			</p>
-
-			<p className={CLASS_NAMES.referral.submessage} style={styles.mutedText}>
-				{rewardDescription ||
-					`Share your link below. When a friend signs up, ${
-						rewardAmount
-							? `both of you get a ${rewardAmount} reward!`
-							: "you both get rewarded!"
-					}`}
-			</p>
+				<p className={CLASS_NAMES.referral.submessage}>
+					{rewardDescription ||
+						(referrerRewardAmount || refereeRewardAmount ? (
+							`Share your link below. ` + 
+							(referrerRewardAmount && refereeRewardAmount 
+								? `You get ${referrerRewardAmount} and your friend gets ${refereeRewardAmount}!` 
+								: referrerRewardAmount 
+									? `When a friend signs up, you get ${referrerRewardAmount}!`
+									: `When a friend signs up, they get ${refereeRewardAmount}!`)
+						) : (
+							`Share your link below. When a friend signs up, you both get rewarded!`
+						))}
+				</p>
+			</div>
 
 			{showReferralLink && (
 				<div className={CLASS_NAMES.referral.copyBlock}>
 					<div className={CLASS_NAMES.referral.copyLabel}>{referralLinkLabel}</div>
-					<div 
-						className={CLASS_NAMES.referral.copyContent} 
-						style={{ ...styles.codeBox, cursor: "pointer" }}
+					<div
+						className={CLASS_NAMES.referral.copyContent}
 						onClick={onCopyLink}
 						title="Click to copy link"
 					>
 						<span className={CLASS_NAMES.referral.linkText}>
 							{linkCopied ? (
-								<span style={{ color: "#10b981", fontWeight: 600 }}>{copySuccessLabel}</span>
+								<span style={{ color: "var(--rrn-ref-success, #10b981)", fontWeight: 600 }}>{copySuccessLabel}</span>
 							) : (
 								referralLink
 							)}
@@ -87,7 +93,6 @@ const ReferralCard: React.FC<ReferralCardProps> = ({
 			<div className={CLASS_NAMES.referral.actionsRow}>
 				<button
 					className={CLASS_NAMES.referral.secondaryBtn}
-					style={styles.outlineBtn}
 					onClick={onCopyLink}
 				>
 					<svg
@@ -108,7 +113,6 @@ const ReferralCard: React.FC<ReferralCardProps> = ({
 				{showShareButton && (
 					<button
 						className={CLASS_NAMES.referral.primaryBtn}
-						style={styles.primaryBtn}
 						onClick={onShare}
 					>
 						<svg
@@ -133,7 +137,7 @@ const ReferralCard: React.FC<ReferralCardProps> = ({
 			</div>
 
 			{showExpiry && expiryHours && (
-				<div className={CLASS_NAMES.referral.expiryNote} style={styles.mutedText}>
+				<div className={CLASS_NAMES.referral.expiryNote}>
 					Reward link expires in {expiryHours} hours.
 				</div>
 			)}

@@ -1,4 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
+import { WidgetTheme } from "../../shared/types";
+import { buildThemeVars } from "../referral/components/ReferralWidget/styles";
 import WidgetTriggerButton from "./components/WidgetTriggerButton";
 import WidgetOverlay from "./components/WidgetOverlay";
 import FeedbackPopper from "./components/FeedbackPopper";
@@ -31,6 +33,7 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = (props) => {
 	const [cloudCustomize, setCloudCustomize] = useState<FeedbackCustomizeProps | undefined>(
 		undefined,
 	);
+	const [cloudTheme, setCloudTheme] = useState<WidgetTheme | undefined>(undefined);
 	const [isLoadingCloud, setIsLoadingCloud] = useState(mode === "cloud");
 
 	useEffect(() => {
@@ -40,6 +43,7 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = (props) => {
 			api.getWidgetConfig()
 				.then((data) => {
 					setCloudCustomize(data.customize);
+					if (data.theme) setCloudTheme(data.theme);
 				})
 				.catch((err) => {
 					console.error(
@@ -77,17 +81,21 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = (props) => {
 		return null;
 	}
 
+	const themeVars = buildThemeVars({ ...parentContext?.theme, ...cloudTheme });
+
 	return (
-		<FeedbackProvider
-			customize={customize}
-			hideTriggerButton={props.hideTriggerButton}
-			onFormSubmit={onFormSubmit}
-		>
-			<WidgetTriggerButton />
-			<WidgetOverlay />
-			<FeedbackPopper />
-			<Notification />
-		</FeedbackProvider>
+		<div style={themeVars} className="rrn-feedback-root">
+			<FeedbackProvider
+				customize={customize}
+				hideTriggerButton={props.hideTriggerButton}
+				onFormSubmit={onFormSubmit}
+			>
+				<WidgetTriggerButton />
+				<WidgetOverlay />
+				<FeedbackPopper />
+				<Notification />
+			</FeedbackProvider>
+		</div>
 	);
 };
 

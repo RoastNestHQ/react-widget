@@ -3,7 +3,7 @@ import config from "../../../../core/config/config";
 import { RoastnestContext } from "../../../../core/context";
 import { ReferrerIdentity, ReferralWidgetProps } from "./types";
 import { DEFAULT_WIDGET_PROPS } from "./defaults";
-import { buildStyles } from "./styles";
+import { buildThemeVars } from "./styles";
 import { useReferralWidget } from "../../hooks/useReferralWidget";
 import { initializeReferralAPI } from "../../hooks/useReferral";
 import { ReferralAPI } from "../../ReferralAPI";
@@ -129,8 +129,8 @@ export const ReferralWidget: React.FC<ReferralWidgetProps> = (userProps) => {
 			hasError = true;
 		}
 
-		if (!userProps.rewardAmount) {
-			console.error("Roastnest Referral SDK: rewardAmount is required in self-hosted mode.");
+		if (!userProps.referrerRewardAmount && !userProps.refereeRewardAmount) {
+			console.error("Roastnest Referral SDK: Reward amounts must be defined in self-hosted mode (provide at least one of referrerRewardAmount or refereeRewardAmount).");
 			hasError = true;
 		}
 	}
@@ -156,7 +156,7 @@ export const ReferralWidget: React.FC<ReferralWidgetProps> = (userProps) => {
 		onEvent: props.onEvent,
 	});
 
-	const styles = buildStyles(props.theme);
+	const themeVars = buildThemeVars({ ...context?.theme, ...props.theme });
 	const widgetState = useReferralWidget(props as ReferralWidgetProps & { projectId: string; referralCode: string; referralLink: string; });
 
 	useEffect(() => {
@@ -176,8 +176,7 @@ export const ReferralWidget: React.FC<ReferralWidgetProps> = (userProps) => {
 					<ReferralPopup
 						isOpen={widgetState.isOpen}
 						onClose={widgetState.close}
-						backdropStyle={styles.backdrop}
-						popupStyle={styles.popup}
+						style={themeVars}
 						closeOnBackdropClick={props.closeOnBackdropClick}
 					>
 						{props.renderCard ? (
@@ -191,7 +190,6 @@ export const ReferralWidget: React.FC<ReferralWidgetProps> = (userProps) => {
 						) : (
 							<ReferralCard
 								{...props}
-								styles={styles}
 								linkCopied={widgetState.linkCopied}
 								onCopyLink={widgetState.copyLink}
 								onShare={widgetState.share}
@@ -212,15 +210,13 @@ export const ReferralWidget: React.FC<ReferralWidgetProps> = (userProps) => {
 				label={props.buttonLabel}
 				icon={props.buttonIcon}
 				mode={props.buttonMode}
-				style={props.buttonStyle}
-				themeStyles={styles}
+				style={{...props.buttonStyle, ...themeVars}}
 			/>
 
 			<ReferralPopup
 				isOpen={widgetState.isOpen}
 				onClose={widgetState.close}
-				backdropStyle={styles.backdrop}
-				popupStyle={styles.popup}
+				style={themeVars}
 				closeOnBackdropClick={props.closeOnBackdropClick}
 			>
 				{props.renderCard ? (
@@ -234,7 +230,6 @@ export const ReferralWidget: React.FC<ReferralWidgetProps> = (userProps) => {
 				) : (
 					<ReferralCard
 						{...props}
-						styles={styles}
 						linkCopied={widgetState.linkCopied}
 						onCopyLink={widgetState.copyLink}
 						onShare={widgetState.share}

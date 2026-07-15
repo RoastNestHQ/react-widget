@@ -1,6 +1,6 @@
-import { FeedbackCustomizeProps } from "../../features/feedback/types";
+import { FeedbackCustomizeProps } from "./types";
 
-const defaultFeedbackConfig: FeedbackCustomizeProps = {
+export const DEFAULT_FEEDBACK_CONFIG: FeedbackCustomizeProps = {
     form: {
         messageInput: {
             placeholder: "Leave your Feedback!",
@@ -54,5 +54,3 @@ const defaultFeedbackConfig: FeedbackCustomizeProps = {
         ],
     },
 };
-
-export default defaultFeedbackConfig;

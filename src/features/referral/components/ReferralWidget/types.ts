@@ -1,4 +1,5 @@
 import React from "react";
+import { WidgetTheme } from "../../../../shared/types";
 
 export type ReferrerIdentity = {
 	id: string;
@@ -61,18 +62,7 @@ export interface LifecycleStage {
 	payload?: Record<string, unknown>;
 }
 
-export interface ReferralTheme {
-	primaryColor?: string;
-	accentColor?: string;
-	successColor?: string;
-	backgroundColor?: string;
-	textColor?: string;
-	mutedTextColor?: string;
-	borderColor?: string;
-	codeBoxColor?: string;
-	borderRadius?: string;
-	fontFamily?: string;
-}
+
 
 export interface BaseReferralWidgetProps {
 	// CONTENT
@@ -80,6 +70,10 @@ export interface BaseReferralWidgetProps {
 	referrerIdentity?: ReferrerIdentity;
 	appIcon?: React.ReactNode;
 	rewardDescription?: string;
+	referrerRewardType?: "monetary" | "coupon" | "in-app" | "other";
+	referrerRewardAmount?: string;
+	refereeRewardType?: "monetary" | "coupon" | "in-app" | "other";
+	refereeRewardAmount?: string;
 	expiryHours?: number;
 
 	// BUTTON
@@ -116,7 +110,7 @@ export interface BaseReferralWidgetProps {
 	shareMessage?: string;
 
 	// THEME
-	theme?: ReferralTheme;
+	theme?: WidgetTheme;
 
 	// CALLBACKS
 	onOpen?: () => void;
@@ -157,7 +151,8 @@ export type ReferralWidgetProps = BaseReferralWidgetProps &
 		  }
 		| {
 				mode: "self-hosted";
-				rewardAmount: string;
+				referrerRewardAmount?: string;
+				refereeRewardAmount?: string;
 				referralLink: `http://${string}` | `https://${string}`;
 				onEvent: (payload: ReferralEventPayload) => Promise<void> | void;
 		  }

@@ -15,7 +15,6 @@ export type {
   ReferralConfig,
   ReferralData,
   ReferralWidgetProps,
-  ReferralTheme,
   ConversionEvent,
   QueuedEvent,
   LifecycleStage,

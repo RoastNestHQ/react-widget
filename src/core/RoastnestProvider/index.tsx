@@ -6,6 +6,7 @@ function Provider({
     projectId,
     children,
     mode = "cloud",
+    theme,
 }: RoastnestProviderProps) {
     const [userData, setUserData] = useState<User | undefined>(undefined);
 
@@ -18,6 +19,7 @@ function Provider({
                 userData,
                 setUser,
                 projectId,
+                theme,
             }}
         >
             {children}

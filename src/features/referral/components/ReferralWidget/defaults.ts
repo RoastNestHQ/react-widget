@@ -1,6 +1,11 @@
 import { ReferralWidgetProps } from "./types";
 
 export const DEFAULT_WIDGET_PROPS: Partial<ReferralWidgetProps> = {
+	rewardDescription: "",
+	referrerRewardType: undefined,
+	referrerRewardAmount: "",
+	refereeRewardType: undefined,
+	refereeRewardAmount: "",
 	appName: "App",
 	expiryHours: 24,
 	buttonLabel: "Refer & Earn",

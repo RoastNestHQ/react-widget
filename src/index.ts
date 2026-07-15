@@ -1,4 +1,9 @@
-import { RoastnestProviderProps } from "./shared/types";
+import { 
+	RoastnestProviderProps, 
+	LocalRoastnestProviderProps, 
+	RemoteRoastnestProviderProps, 
+	WidgetTheme 
+} from "./shared/types";
 import RoastnestProvider from "./core/RoastnestProvider";
 
 import "./global.css";
@@ -20,7 +25,6 @@ export type {
 	LifecycleStage,
 	ReferralEventPayload,
 	ReferralWidgetProps,
-	ReferralTheme,
 } from "./features/referral";
 
 // Feedback exports

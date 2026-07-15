@@ -158,7 +158,8 @@ function InvitePage() {
     <ReferralWidget
       referralLink="https://myapp.com/invite"
       appName="My Awesome App"
-      rewardAmount="$20"
+      referrerRewardAmount="$20"
+      refereeRewardAmount="$10"
       onEvent={(payload) => console.log("Referral Event:", payload)}
     />
   );

@@ -10,7 +10,6 @@ interface ReferralButtonProps {
   icon?: React.ReactNode;
   mode?: 'icon' | 'text' | 'both';
   style?: React.CSSProperties;
-  themeStyles: any;
 }
 
 const ReferralButton: React.FC<ReferralButtonProps> = ({ 
@@ -19,8 +18,7 @@ const ReferralButton: React.FC<ReferralButtonProps> = ({
   label,
   icon,
   mode = 'both',
-  style,
-  themeStyles 
+  style
 }) => {
   const isIconOnly = mode === 'icon';
   const isTextOnly = mode === 'text';
