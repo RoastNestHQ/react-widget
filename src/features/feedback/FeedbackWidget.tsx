@@ -13,6 +13,7 @@ import ApiInstance from "../../shared/utils/api";
 
 export interface BaseFeedbackWidgetProps {
 	hideTriggerButton?: boolean;
+	children?: React.ReactNode;
 }
 
 export type FeedbackWidgetProps = BaseFeedbackWidgetProps &
@@ -90,6 +91,7 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = (props) => {
 				hideTriggerButton={props.hideTriggerButton}
 				onFormSubmit={onFormSubmit}
 			>
+				{props.children}
 				<WidgetTriggerButton />
 				<WidgetOverlay />
 				<FeedbackPopper />

@@ -5,6 +5,17 @@ All notable changes to `@roastnest/react` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),  
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-07-31
+
+### Fixed
+- **FeedbackWidget**: Added support for `children` prop to correctly wrap the application and expose the `useFeedback` context.
+
+## [1.1.0] - 2026-07-31
+
+### Added
+- **WidgetTriggerButton**: Added styles for WidgetTriggerButton component with multi-placement support.
+- **Configurable Rewards**: Implemented referral and feedback widgets with configurable reward splits and UI components.
+
 ## [1.0.0] - 2026-07-12
 
 ### Added
