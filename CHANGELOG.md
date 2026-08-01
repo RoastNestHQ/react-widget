@@ -5,6 +5,14 @@ All notable changes to `@roastnest/react` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),  
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.7] - 2026-08-02
+
+### Added
+- **Development-only logging**: API responses (`/v1/config`, `/v1/referrals/link`, `/v1/referrals/events`, feedback submission, upload URL) and key actions (widget open/close, link copied, share triggered, referral detected, conversion tracked, identity set, feedback submitted) are now logged to the console as `[Roastnest][API]` / `[Roastnest][Action]`. Dead-code-eliminated from production builds - verified zero occurrences in the `yarn build-pro` output.
+
+### Changed
+- **Dev builds point at a local tunnel instead of production**: `yarn build-dev` now bundles a configurable local/ngrok URL instead of `api.roastnest.com`, so local widget testing hits a local backend without hand-editing `config.ts`. `yarn build-pro` is unaffected.
+
 ## [1.1.6] - 2026-08-01
 
 ### Changed
