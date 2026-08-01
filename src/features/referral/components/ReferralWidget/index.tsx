@@ -11,8 +11,10 @@ import ReferralButton from "../ReferralButton";
 import ReferralPopup from "../ReferralPopup";
 import ReferralCard from "../ReferralCard";
 import ApiInstance from "../../../../shared/utils/api";
+import RoastnestErrorBoundary from "../../../../shared/components/ErrorBoundary";
+import { mergeDeep } from "../../../../utils/mergeDeep";
 
-export const ReferralWidget: React.FC<ReferralWidgetProps> = (userProps) => {
+const ReferralWidgetInner: React.FC<ReferralWidgetProps> = (userProps) => {
 	const context = useContext(RoastnestContext);
 	const effectiveProjectId = context?.projectId;
 	const mode = userProps.mode || context?.mode || "cloud";
@@ -147,10 +149,20 @@ export const ReferralWidget: React.FC<ReferralWidgetProps> = (userProps) => {
 		return null;
 	}
 
+	// `theme` is a nested object - a flat spread of cloudData over userProps
+	// would silently drop theme sub-fields set locally but not touched on the
+	// server (same shallow-merge bug as FeedbackWidget's `customize`), so it's
+	// deep-merged separately and applied after the flat spread below.
+	const mergedTheme = mergeDeep(
+		mergeDeep(DEFAULT_WIDGET_PROPS.theme || {}, userProps.theme),
+		mode === "cloud" ? cloudData?.theme : undefined,
+	);
+
 	const props = {
 		...DEFAULT_WIDGET_PROPS,
 		...userProps,
 		...(mode === "cloud" ? cloudData : {}),
+		theme: mergedTheme,
 		projectId: effectiveProjectId,
 		referrerIdentity: finalReferrerIdentity,
 		referralCode: finalCode,
@@ -164,7 +176,7 @@ export const ReferralWidget: React.FC<ReferralWidgetProps> = (userProps) => {
 		onEvent: props.onEvent,
 	});
 
-	const themeVars = buildThemeVars({ ...context?.theme, ...props.theme });
+	const themeVars = buildThemeVars(mergeDeep(context?.theme || {}, props.theme));
 	const widgetState = useReferralWidget(props as ReferralWidgetProps & { projectId: string; referralCode: string; referralLink: string; });
 
 	useEffect(() => {
@@ -247,3 +259,12 @@ export const ReferralWidget: React.FC<ReferralWidgetProps> = (userProps) => {
 		</>
 	);
 };
+
+// ReferralWidget renders no host content of its own (unlike FeedbackWidget,
+// it never wraps `children`), so it's safe to wrap the whole thing - a crash
+// anywhere inside just means the referral widget disappears, nothing else.
+export const ReferralWidget: React.FC<ReferralWidgetProps> = (props) => (
+	<RoastnestErrorBoundary>
+		<ReferralWidgetInner {...props} />
+	</RoastnestErrorBoundary>
+);

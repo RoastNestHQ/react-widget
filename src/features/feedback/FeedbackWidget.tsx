@@ -5,9 +5,11 @@ import WidgetTriggerButton from "./components/WidgetTriggerButton";
 import WidgetOverlay from "./components/WidgetOverlay";
 import FeedbackPopper from "./components/FeedbackPopper";
 import Notification from "../../shared/components/Notification";
+import RoastnestErrorBoundary from "../../shared/components/ErrorBoundary";
 import { RoastnestContext } from "../../core/context";
 import { FeedbackCustomizeProps, FormSubmitHandler } from "./types";
 import { FeedbackProvider } from "./FeedbackProvider";
+import { mergeDeep } from "../../utils/mergeDeep";
 
 import ApiInstance from "../../shared/utils/api";
 
@@ -73,8 +75,13 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = (props) => {
 		return null;
 	}
 
+	// Deep merge, not a shallow spread - cloud config setting only e.g.
+	// `form.errorMessage` must not wipe out a locally-configured
+	// `form.submitButton.label` that the server never touched.
 	const customize =
-		mode === "cloud" ? { ...props.customize, ...cloudCustomize } : props.customize;
+		mode === "cloud"
+			? mergeDeep<FeedbackCustomizeProps>(props.customize || {}, cloudCustomize)
+			: props.customize;
 	const onFormSubmit = mode === "self-hosted" ? props.onFormSubmit : undefined;
 
 	if (mode === "self-hosted" && !onFormSubmit) {
@@ -92,10 +99,14 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = (props) => {
 				onFormSubmit={onFormSubmit}
 			>
 				{props.children}
-				<WidgetTriggerButton />
-				<WidgetOverlay />
-				<FeedbackPopper />
-				<Notification />
+				{/* Only the widget's own UI is inside the boundary - if it throws,
+				    `children` (the host's actual page) above is unaffected. */}
+				<RoastnestErrorBoundary>
+					<WidgetTriggerButton />
+					<WidgetOverlay />
+					<FeedbackPopper />
+					<Notification />
+				</RoastnestErrorBoundary>
 			</FeedbackProvider>
 		</div>
 	);
