@@ -55,13 +55,27 @@ const ReferralWidgetInner: React.FC<ReferralWidgetProps> = (userProps) => {
 			// doesn't (and shouldn't) accept unknown fields nested inside
 			// `identity`, so leaving `hash` in there fails validation.
 			const { hash: _hash, ...identityForRequest } = finalReferrerIdentity || {};
-			apiInstance.getReferralSetup({
-				visitorId,
-				identity: identityForRequest,
-				identityHash: finalReferrerIdentity?.hash,
-			})
-				.then((data) => {
-					setCloudData(data);
+
+			// Two calls instead of one: /v1/config (customization + theme -
+			// shared with FeedbackWidget and deduped in ApiInstance if both are
+			// mounted) and /v1/referrals/link (identity-verified, just the
+			// personalized code/link). Merged back into the same shape the
+			// rest of this component already expects, so nothing downstream
+			// needs to change.
+			Promise.all([
+				apiInstance.getConfig(),
+				apiInstance.getReferralLink({
+					visitorId,
+					identity: identityForRequest,
+					identityHash: finalReferrerIdentity?.hash,
+				}),
+			])
+				.then(([configData, linkData]: [any, any]) => {
+					setCloudData({
+						...(configData?.referral || {}),
+						...(configData?.theme && { theme: configData.theme }),
+						...linkData,
+					});
 				})
 				.catch((err) => {
 					console.error("Roastnest Referral SDK: Error fetching cloud referral setup:", err);

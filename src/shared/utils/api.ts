@@ -3,7 +3,13 @@ import * as device from "react-device-detect";
 import PersonManager from "../../core/PersonManager";
 import config from "../../core/config/config";
 
-const webhookAPI = config.webhookAPI;
+const widgetAPI = config.widgetAPI;
+
+// Shared across every ApiInstance (FeedbackWidget and ReferralWidget each
+// create their own), keyed by siteId, so that if both widgets are mounted
+// together they trigger exactly one /v1/config request instead of two -
+// the second caller just awaits the same in-flight/resolved promise.
+const configRequestCache = new Map<string, Promise<unknown>>();
 
 interface UploadImageToS3Props {
 	uploadURL: string; // Pre-signed URL for S3 upload
@@ -57,7 +63,7 @@ class ApiInstance {
 			const contentType = "image/png";
 			const fileName = `${type}.png`;
 
-			const response = await fetch(webhookAPI + "/v1/get-upload-url", {
+			const response = await fetch(widgetAPI + "/v1/get-upload-url", {
 				method: "POST",
 				headers: {
 					"X-Site-Code": this.siteId,
@@ -115,7 +121,7 @@ class ApiInstance {
 				userData = user;
 			}
 
-			const response = await fetch(webhookAPI + "/v2/submit-feedback", {
+			const response = await fetch(widgetAPI + "/v2/submit-feedback", {
 				method: "POST",
 				headers: {
 					"X-Site-Code": this.siteId,
@@ -218,9 +224,18 @@ class ApiInstance {
 		}
 	}
 
-	async getWidgetConfig() {
-		return this.retry(async () => {
-			const response = await fetch(`${webhookAPI}/v1/widgets/config`, {
+	/**
+	 * One call for feedback + referral customization + theme. Deduped across
+	 * every ApiInstance sharing the same siteId - if FeedbackWidget and
+	 * ReferralWidget are both mounted, only the first caller actually hits
+	 * the network; the second reuses that same request.
+	 */
+	async getConfig(): Promise<{ feedback?: unknown; referral?: unknown; theme?: unknown }> {
+		const cached = configRequestCache.get(this.siteId);
+		if (cached) return cached as Promise<{ feedback?: unknown; referral?: unknown; theme?: unknown }>;
+
+		const request = this.retry(async () => {
+			const response = await fetch(`${widgetAPI}/v1/config`, {
 				method: "POST",
 				headers: {
 					"X-Site-Code": this.siteId,
@@ -231,11 +246,23 @@ class ApiInstance {
 
 			return response.json();
 		});
+
+		configRequestCache.set(this.siteId, request);
+		// A failed request must not poison the cache forever - the next
+		// caller (or a retry) should get a fresh attempt, not a replayed
+		// rejection.
+		request.catch(() => configRequestCache.delete(this.siteId));
+
+		return request as Promise<{ feedback?: unknown; referral?: unknown; theme?: unknown }>;
 	}
 
-	async getReferralSetup(payload: { visitorId: string; identity?: any; identityHash?: string }) {
+	/**
+	 * Identity-verified: returns only the personalized referral code/link.
+	 * Customization lives in `getConfig()` instead.
+	 */
+	async getReferralLink(payload: { visitorId: string; identity?: any; identityHash?: string }) {
 		return this.retry(async () => {
-			const response = await fetch(`${webhookAPI}/v1/referrals/setup`, {
+			const response = await fetch(`${widgetAPI}/v1/referrals/link`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -244,7 +271,7 @@ class ApiInstance {
 				body: JSON.stringify(payload)
 			});
 
-			if (!response.ok) throw new Error("Error getting referral setup");
+			if (!response.ok) throw new Error("Error getting referral link");
 
 			return response.json();
 		});
@@ -252,7 +279,7 @@ class ApiInstance {
 
 	async postReferralEvent(payload: any) {
 		return this.retry(async () => {
-			const response = await fetch(`${webhookAPI}/v1/referrals/events`, {
+			const response = await fetch(`${widgetAPI}/v1/referrals/events`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -262,7 +289,7 @@ class ApiInstance {
 			});
 
 			if (!response.ok) throw new Error(`Error posting referral event: ${response.statusText}`);
-			
+
 			// Some webhook responses might be empty
 			const text = await response.text();
 			return text ? JSON.parse(text) : { success: true };

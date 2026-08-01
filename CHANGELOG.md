@@ -5,6 +5,12 @@ All notable changes to `@roastnest/react` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),  
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.6] - 2026-08-01
+
+### Changed
+- **API routes consolidated under `/api/widget/`**: the widget now calls `POST /api/widget/v1/config`, `/v1/referrals/link`, `/v1/referrals/events`, `/v1/submit-feedback`, `/v2/submit-feedback`, and `/v1/get-upload-url` instead of the old `/api/webhook/...` paths. `getWidgetConfig()`/`getReferralSetup()` are renamed to `getConfig()`/`getReferralLink()`.
+- **Fewer network calls**: `FeedbackWidget` and `ReferralWidget` now share a single `/v1/config` request (feedback customization + referral customization + theme merged server-side) instead of each widget fetching its own config separately. Requests are deduplicated per `siteId`, so mounting both widgets together still triggers only one config call. `ReferralWidget`'s cloud mode now fetches the personalized code/link via a separate, slimmer `/v1/referrals/link` call.
+
 ## [1.1.5] - 2026-08-01
 
 ### Fixed

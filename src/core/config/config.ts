@@ -1,3 +1,3 @@
-const webhookAPI = "https://api.roastnest.com/api/webhook";
+const widgetAPI = "https://api.roastnest.com/api/widget";
 
-export default { webhookAPI };
+export default { widgetAPI };

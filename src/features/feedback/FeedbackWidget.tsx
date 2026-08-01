@@ -43,10 +43,10 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = (props) => {
 		if (mode === "cloud" && effectiveProjectId) {
 			setIsLoadingCloud(true);
 			const api = new ApiInstance({ siteId: effectiveProjectId });
-			api.getWidgetConfig()
+			api.getConfig()
 				.then((data) => {
-					setCloudCustomize(data.customize);
-					if (data.theme) setCloudTheme(data.theme);
+					setCloudCustomize(data.feedback as FeedbackCustomizeProps | undefined);
+					if (data.theme) setCloudTheme(data.theme as WidgetTheme);
 				})
 				.catch((err) => {
 					console.error(
