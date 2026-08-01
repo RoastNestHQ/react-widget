@@ -5,6 +5,12 @@ All notable changes to `@roastnest/react` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),  
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.4] - 2026-08-01
+
+### Fixed
+- **ReferralWidget (self-hosted mode)**: `referralLink`'s absolute-URL validation only ran when `window` existed, so a bare path like `/invite` silently passed through unvalidated during SSR instead of failing loudly. It now runs unconditionally.
+- **ReferralWidget (self-hosted mode)**: `referralLink` values that already included a reserved query param (`ref`, `refId`, `refName`, `refEmail`, `refPhone`) were silently overwritten with no warning. Now rejected with a clear error, since those params are exclusively managed by the widget.
+
 ## [1.1.3] - 2026-08-01
 
 ### Added
