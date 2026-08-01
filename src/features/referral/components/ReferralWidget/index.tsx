@@ -49,7 +49,15 @@ export const ReferralWidget: React.FC<ReferralWidgetProps> = (userProps) => {
 			setIsLoadingCloud(true);
 			
 			const apiInstance = new ApiInstance({ siteId: effectiveProjectId });
-			apiInstance.getReferralSetup({ visitorId, identity: finalReferrerIdentity })
+			// Send `hash` only via `identityHash` - the backend's identity schema
+			// doesn't (and shouldn't) accept unknown fields nested inside
+			// `identity`, so leaving `hash` in there fails validation.
+			const { hash: _hash, ...identityForRequest } = finalReferrerIdentity || {};
+			apiInstance.getReferralSetup({
+				visitorId,
+				identity: identityForRequest,
+				identityHash: finalReferrerIdentity?.hash,
+			})
 				.then((data) => {
 					setCloudData(data);
 				})

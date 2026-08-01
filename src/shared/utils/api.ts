@@ -233,7 +233,7 @@ class ApiInstance {
 		});
 	}
 
-	async getReferralSetup(payload: { visitorId: string; identity?: any }) {
+	async getReferralSetup(payload: { visitorId: string; identity?: any; identityHash?: string }) {
 		return this.retry(async () => {
 			const response = await fetch(`${webhookAPI}/v1/referrals/setup`, {
 				method: "POST",

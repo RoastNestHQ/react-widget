@@ -6,6 +6,13 @@ export type ReferrerIdentity = {
 	name: string;
 	email?: string;
 	phone?: string;
+	/**
+	 * HMAC-SHA256(project webhook secret, email), computed on your own
+	 * backend. Cloud mode requires this to prove you're vouching for this
+	 * identity - it's what stops a visitor from claiming to be someone else
+	 * and fetching/creating that person's referral link.
+	 */
+	hash?: string;
 };
 
 export interface ReferralConfig {
