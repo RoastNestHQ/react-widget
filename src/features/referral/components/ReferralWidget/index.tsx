@@ -72,26 +72,33 @@ const ReferralWidgetInner: React.FC<ReferralWidgetProps> = (userProps) => {
 		}
 	}, [mode, effectiveProjectId, finalReferrerIdentity]);
 
-	if (mode === "cloud" && !effectiveProjectId) {
-		console.error("Roastnest Referral SDK: projectId is required via RoastnestProvider in cloud mode");
-		return null;
-	}
-
-	if (isLoadingCloud) {
-		return null;
-	}
-
+	// Every hook in this component must run unconditionally on every render
+	// (Rules of Hooks) - this used to branch into early `return null`s before
+	// reaching `useReferralWidget`/the mount effect further down, so the
+	// "loading" render called fewer hooks than the "loaded" render. Cloud
+	// mode is the only path with that async loading transition, which is
+	// why this only ever crashed there ("Rendered more hooks than during
+	// the previous render") - self-hosted mode has no loading state and
+	// never surfaced it. Errors are now tracked as a flag that only affects
+	// what's *rendered*, never which hooks run.
 	let finalCode = "";
 	let finalLink = "";
-	let hasError = false;
+	let hasError = (mode === "cloud" && !effectiveProjectId) || isLoadingCloud;
 
-	if (mode === "cloud") {
+	if (mode === "cloud" && !effectiveProjectId) {
+		console.error("Roastnest Referral SDK: projectId is required via RoastnestProvider in cloud mode");
+	}
+
+	if (hasError) {
+		// skip the branch below entirely - loading or missing projectId
+	} else if (mode === "cloud") {
 		if (!cloudData) {
 			console.error("Roastnest Referral SDK: Cloud referral setup could not be loaded.");
-			return null;
+			hasError = true;
+		} else {
+			finalCode = cloudData.referralCode;
+			finalLink = cloudData.referralLink;
 		}
-		finalCode = cloudData.referralCode;
-		finalLink = cloudData.referralLink;
 	} else {
 		finalCode = localStorage.getItem("roastnest_my_referral_code") || "";
 		if (!finalCode) {
@@ -168,10 +175,6 @@ const ReferralWidgetInner: React.FC<ReferralWidgetProps> = (userProps) => {
 		}
 	}
 
-	if (hasError) {
-		return null;
-	}
-
 	// `theme` is a nested object - a flat spread of cloudData over userProps
 	// would silently drop theme sub-fields set locally but not touched on the
 	// server (same shallow-merge bug as FeedbackWidget's `customize`), so it's
@@ -192,19 +195,27 @@ const ReferralWidgetInner: React.FC<ReferralWidgetProps> = (userProps) => {
 		referralLink: finalLink,
 	} as ReferralWidgetProps & { projectId: string; referralCode: string; referralLink: string; onEvent?: any };
 
+	// These two hooks used to sit after the `hasError` early return removed
+	// above - they must run on every render regardless of error/loading
+	// state (see the Rules of Hooks note above `hasError`'s declaration).
+	const themeVars = buildThemeVars(mergeDeep(context?.theme || {}, props.theme));
+	const widgetState = useReferralWidget(props as ReferralWidgetProps & { projectId: string; referralCode: string; referralLink: string; });
+
+	useEffect(() => {
+		if (!hasError) props.onMount?.(props.projectId);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [props.projectId, hasError]);
+
+	if (hasError) {
+		return null;
+	}
+
 	initializeReferralAPI({
 		projectId: effectiveProjectId,
 		mode: mode,
 		enabled: true,
 		onEvent: props.onEvent,
 	});
-
-	const themeVars = buildThemeVars(mergeDeep(context?.theme || {}, props.theme));
-	const widgetState = useReferralWidget(props as ReferralWidgetProps & { projectId: string; referralCode: string; referralLink: string; });
-
-	useEffect(() => {
-		props.onMount?.(props.projectId);
-	}, [props.projectId]);
 
 	if (props.renderTrigger) {
 		return (
