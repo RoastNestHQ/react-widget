@@ -5,6 +5,14 @@ All notable changes to `@roastnest/react` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),  
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.3] - 2026-08-01
+
+### Added
+- **Fault isolation**: `FeedbackWidget` and `ReferralWidget` are now wrapped in an internal error boundary. A crash inside the widget's own UI is contained and renders nothing instead of taking down the host page. For `FeedbackWidget`, the boundary wraps only the widget's own UI - `children` (the host site's actual content) is unaffected even if the widget fails entirely.
+
+### Fixed
+- **Cloud mode customization**: server-provided config (`customize` for `FeedbackWidget`, `theme` for `ReferralWidget`) was merged with a shallow spread, so a partial server config (e.g. only `form.errorMessage` set) would silently wipe out sibling fields configured locally in code (e.g. `form.submitButton.label`). Now deep-merged so local and server config combine instead of one replacing the other wholesale.
+
 ## [1.1.2] - 2026-08-01
 
 ### Added
