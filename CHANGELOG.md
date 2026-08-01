@@ -5,7 +5,13 @@ All notable changes to `@roastnest/react` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),  
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.1.7] - 2026-08-02
+## [1.1.8] - 2026-08-02
+
+### Fixed
+- **Theme `primaryColor` not reaching trigger/primary buttons**: `buildThemeVars` mapped the `--rrn-clr-600` CSS variable to `mutedTextColor` instead of `primaryColor`, but `WidgetTriggerButton`, `ReferralButton` (they share the same CSS class), and `FeedbackForm`'s submit button all read `--rrn-clr-600` directly for their background. Any `primaryColor` change - from the Customize page or a local `theme` prop - silently had no visual effect on those buttons. Fixed to map `--rrn-clr-600` to `primaryColor`.
+
+### Changed
+- **Default `primaryColor` is now `#9a5151`** (was `#111111`), matching the frontend Customize page's default and the backend's new `projects.theme_primary_color` column default.
 
 ### Added
 - **Development-only logging**: API responses (`/v1/config`, `/v1/referrals/link`, `/v1/referrals/events`, feedback submission, upload URL) and key actions (widget open/close, link copied, share triggered, referral detected, conversion tracked, identity set, feedback submitted) are now logged to the console as `[Roastnest][API]` / `[Roastnest][Action]`. Dead-code-eliminated from production builds - verified zero occurrences in the `yarn build-pro` output.

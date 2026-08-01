@@ -17,10 +17,14 @@ export function buildThemeVars(theme?: WidgetTheme): React.CSSProperties {
     "--rrn-ref-radius": t.borderRadius,
     "--rrn-ref-font": t.fontFamily,
     // Add global feedback variables
+    // --rrn-clr-600 is the feedback/trigger-button CSS's actual "primary"
+    // slot (WidgetTriggerButton, ReferralButton, and FeedbackForm's submit
+    // button all read it directly) - it must carry primaryColor, not
+    // mutedTextColor, or theme changes never reach those buttons.
     "--rrn-clr-primary": t.primaryColor,
     "--rrn-clr-50": t.backgroundColor,
     "--rrn-clr-900": t.textColor,
-    "--rrn-clr-600": t.mutedTextColor,
+    "--rrn-clr-600": t.primaryColor,
     "--rrn-clr-200": t.borderColor,
     "--rrn-clr-radius": t.borderRadius,
     "--rrn-clr-font": t.fontFamily,
