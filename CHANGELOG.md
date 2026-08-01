@@ -5,6 +5,11 @@ All notable changes to `@roastnest/react` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),  
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.5] - 2026-08-01
+
+### Fixed
+- **ReferralWidget (cloud mode) - critical**: fixed a Rules of Hooks violation that made the widget silently disappear in cloud mode. `useReferralWidget()` and a mount `useEffect` were called after early returns for the missing-projectId/loading/error states; since cloud mode is the only path with an async loading transition, the first render (loading) called fewer hooks than the loaded render, and React's hook-count-mismatch error caused the widget to be silently hidden by the error boundary. Self-hosted mode never had this problem, since it has no loading state. All hooks now run unconditionally on every render.
+
 ## [1.1.4] - 2026-08-01
 
 ### Fixed
