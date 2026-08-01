@@ -105,11 +105,34 @@ const ReferralWidgetInner: React.FC<ReferralWidgetProps> = (userProps) => {
 			hasError = true;
 		} else {
 			finalLink = userProps.referralLink;
-			if (typeof window !== "undefined") {
-				try {
-					const url = new URL(finalLink);
-					if (!url.hostname) throw new Error("Invalid URL");
 
+			// These query params are owned exclusively by this widget - it sets
+			// them below on every render. If a caller pre-includes one in their
+			// referralLink, whatever value they set gets silently clobbered, so
+			// that's treated as a config error instead of a confusing runtime
+			// surprise. Any other path/query the caller adds (/invite, /register,
+			// ?utm_source=..., etc.) is untouched and fully supported.
+			const RESERVED_PARAMS = ["ref", "refId", "refName", "refEmail", "refPhone"];
+
+			try {
+				// `URL` is a global in both Node and the browser, so this check
+				// - referralLink must be an absolute URL with a real base
+				// (protocol + host), not a bare path like "/invite" - runs
+				// unconditionally, including during SSR, not just client-side.
+				const url = new URL(finalLink);
+				if (!url.protocol.startsWith("http") || !url.hostname) {
+					throw new Error("Invalid URL");
+				}
+
+				const conflictingParams = RESERVED_PARAMS.filter((param) => url.searchParams.has(param));
+				if (conflictingParams.length > 0) {
+					console.error(
+						`Roastnest Referral SDK: referralLink must not include the reserved param(s) (${conflictingParams.join(", ")}) - these are added automatically and cannot be set by the caller.`,
+					);
+					hasError = true;
+				} else if (typeof window !== "undefined") {
+					// The hostname-match check needs an actual browser location,
+					// so it (and appending the tracking params) stays client-only.
 					if (url.hostname !== window.location.hostname) {
 						console.error(
 							`Roastnest Referral SDK: referralLink domain (${url.hostname}) must match the current website domain (${window.location.hostname}).`,
@@ -125,12 +148,12 @@ const ReferralWidgetInner: React.FC<ReferralWidgetProps> = (userProps) => {
 						}
 						finalLink = url.toString() as `http://${string}` | `https://${string}`;
 					}
-				} catch (err: any) {
-					console.error(
-						"Roastnest Referral SDK: referralLink must be an absolute URL containing a domain (e.g., https://example.com/invite).",
-					);
-					hasError = true;
 				}
+			} catch (err: any) {
+				console.error(
+					"Roastnest Referral SDK: referralLink must be an absolute URL with a base URL/domain (e.g., https://example.com/invite, https://example.com/register).",
+				);
+				hasError = true;
 			}
 		}
 
