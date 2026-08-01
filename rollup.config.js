@@ -7,6 +7,7 @@ import terser from "@rollup/plugin-terser";
 import dts from "rollup-plugin-dts";
 import postcssImport from "postcss-import";
 import { visualizer } from "rollup-plugin-visualizer";
+import replace from "@rollup/plugin-replace";
 
 const packageJson = require("./package.json");
 const isProduction = process.env.NODE_ENV === "production";
@@ -34,6 +35,12 @@ export default [
 		],
 		plugins: [
 			peerDepsExternal(),
+			replace({
+				preventAssignment: true,
+				values: {
+					"process.env.NODE_ENV": JSON.stringify(isProduction ? "production" : "development"),
+				},
+			}),
 			resolve(),
 			commonjs(),
 			typescript({ tsconfig: "./tsconfig.json" }),
