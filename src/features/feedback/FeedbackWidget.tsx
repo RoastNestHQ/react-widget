@@ -64,16 +64,26 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = (props) => {
 		throw new Error("FeedbackWidget must be used within a RoastnestProvider");
 	}
 
-	if (mode === "cloud" && !effectiveProjectId) {
+	// `children` (the host's actual page) must render unconditionally - only
+	// the widget's own UI is gated on these checks. A missing projectId,
+	// missing onFormSubmit, or an in-flight cloud config fetch used to
+	// `return null` here before children ever rendered, which - since
+	// FeedbackWidget wraps `children` - blanked out the host's entire page
+	// during that window, not just the widget's own trigger button.
+	const missingProjectId = mode === "cloud" && !effectiveProjectId;
+	if (missingProjectId) {
 		console.error(
 			"Roastnest Feedback SDK: projectId is required via RoastnestProvider in cloud mode",
 		);
-		return null;
 	}
 
-	if (isLoadingCloud) {
-		return null;
+	const onFormSubmit = mode === "self-hosted" ? props.onFormSubmit : undefined;
+	const missingOnFormSubmit = mode === "self-hosted" && !onFormSubmit;
+	if (missingOnFormSubmit) {
+		console.error("Roastnest Feedback SDK: onFormSubmit is required in self-hosted mode.");
 	}
+
+	const showWidgetUI = !missingProjectId && !missingOnFormSubmit && !isLoadingCloud;
 
 	// Deep merge, not a shallow spread - cloud config setting only e.g.
 	// `form.errorMessage` must not wipe out a locally-configured
@@ -82,12 +92,6 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = (props) => {
 		mode === "cloud"
 			? mergeDeep<FeedbackCustomizeProps>(props.customize || {}, cloudCustomize)
 			: props.customize;
-	const onFormSubmit = mode === "self-hosted" ? props.onFormSubmit : undefined;
-
-	if (mode === "self-hosted" && !onFormSubmit) {
-		console.error("Roastnest Feedback SDK: onFormSubmit is required in self-hosted mode.");
-		return null;
-	}
 
 	const themeVars = buildThemeVars({ ...parentContext?.theme, ...cloudTheme });
 
@@ -101,12 +105,14 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = (props) => {
 				{props.children}
 				{/* Only the widget's own UI is inside the boundary - if it throws,
 				    `children` (the host's actual page) above is unaffected. */}
-				<RoastnestErrorBoundary>
-					<WidgetTriggerButton />
-					<WidgetOverlay />
-					<FeedbackPopper />
-					<Notification />
-				</RoastnestErrorBoundary>
+				{showWidgetUI && (
+					<RoastnestErrorBoundary>
+						<WidgetTriggerButton />
+						<WidgetOverlay />
+						<FeedbackPopper />
+						<Notification />
+					</RoastnestErrorBoundary>
+				)}
 			</FeedbackProvider>
 		</div>
 	);

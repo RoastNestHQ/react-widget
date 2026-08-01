@@ -1,5 +1,5 @@
 {
-  "version": "1.1.9",
+  "version": "1.1.10",
   "name": "@roastnest/react",
   "description": "A RoastNest widget for honest feedback",
   "main": "dist/index.js",
@@ -14,7 +14,8 @@
     "build-dev": "yarn clean && rollup -c --bundleConfigAsCjs",
     "build-pro": "yarn clean && rollup -c --bundleConfigAsCjs --environment NODE_ENV:production",
     "typecheck": "tsc --noEmit",
-    "yalc:push": "yarn build-dev && npx yalc push"
+    "yalc:push": "yarn build-dev && npx yalc push",
+    "prepublishOnly": "yarn build-pro && node scripts/assert-prod-build.js"
   },
   "files": [
     "dist"

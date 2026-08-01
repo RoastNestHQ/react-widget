@@ -5,6 +5,12 @@ All notable changes to `@roastnest/react` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),  
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.10] - 2026-08-02
+
+### Fixed
+- **Critical: 1.1.9 was published pointing at a local ngrok tunnel instead of production** (same failure mode as 1.1.7). Added a `prepublishOnly` script that always runs `build-pro` and a new `scripts/assert-prod-build.js` check before `npm publish` can proceed, regardless of what `dist/` already contained - this class of mistake can no longer reach npm.
+- **`FeedbackWidget` blanked out the host's entire page while cloud config was loading or on a config error**: it wraps `children` (the host's actual page content), but returned `null` before ever reaching the `children`-rendering branch during the `/v1/config` fetch, a missing `projectId`, or a missing `onFormSubmit` in self-hosted mode. `children` now always renders unconditionally; only the widget's own trigger button/popper/notification UI is gated on those checks.
+
 ## [1.1.9] - 2026-08-02
 
 ### Changed
