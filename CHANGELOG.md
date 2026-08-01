@@ -5,6 +5,11 @@ All notable changes to `@roastnest/react` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),  
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.9] - 2026-08-02
+
+### Changed
+- **Corrected default `primaryColor` to `#5e2f1d`** (1.1.8 shipped `#9a5151` in error), matching the frontend Customize page's default and the backend's `projects.theme_primary_color` column default.
+
 ## [1.1.8] - 2026-08-02
 
 ### Fixed

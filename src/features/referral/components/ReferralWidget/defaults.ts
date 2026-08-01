@@ -22,7 +22,7 @@ export const DEFAULT_WIDGET_PROPS: Partial<ReferralWidgetProps> = {
 	closeOnBackdropClick: true,
 	showExpiry: true,
 	theme: {
-		primaryColor: "#9a5151",
+		primaryColor: "#5e2f1d",
 		accentColor: "#2563eb",
 		successColor: "#16a34a",
 		backgroundColor: "#ffffff",
