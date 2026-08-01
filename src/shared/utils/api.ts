@@ -2,6 +2,7 @@ import { ScreenshotBlobs, ScreenshotType, User } from "../types";
 import * as device from "react-device-detect";
 import PersonManager from "../../core/PersonManager";
 import config from "../../core/config/config";
+import { devLog } from "./devLog";
 
 const widgetAPI = config.widgetAPI;
 
@@ -78,6 +79,7 @@ class ApiInstance {
 			if (!response.ok) throw new Error("Error getting pre-signed URL");
 
 			const parsedResponse = await response.json();
+			devLog("API", "POST /v1/get-upload-url response", parsedResponse);
 			return {
 				uploadURL: parsedResponse.url,
 				imageKey: parsedResponse.key,
@@ -100,6 +102,7 @@ class ApiInstance {
 
 			if (!response.ok) throw new Error("Error uploading image");
 
+			devLog("API", "PUT S3 upload response", { status: response.status, ok: response.ok });
 			return response;
 		});
 	}
@@ -173,6 +176,7 @@ class ApiInstance {
 			if (!response.ok) throw new Error("Error submitting feedback to DB");
 
 			const responseData = await response.json();
+			devLog("API", "POST /v2/submit-feedback response", responseData);
 
 			// If person data is returned, save it to local storage
 			personManager.setDetails(responseData.person);
@@ -211,12 +215,14 @@ class ApiInstance {
 			// Submit the feedback to the database
 			const response = await this.submitFeedbackToDB({ message, user, screenshots });
 
+			devLog("Action", "Feedback submitted successfully", { trackingUrl: response.trackingUrl });
 			return {
 				trackingUrl: response.trackingUrl,
 				message: "Feedback sent successfully!",
 				success: true,
 			};
 		} catch (error) {
+			devLog("Action", "Feedback submission failed", error);
 			return {
 				message: "Failed to send feedback, try again!",
 				success: false,
@@ -244,7 +250,9 @@ class ApiInstance {
 
 			if (!response.ok) throw new Error("Error getting widget config");
 
-			return response.json();
+			const data = await response.json();
+			devLog("API", "POST /v1/config response", data);
+			return data;
 		});
 
 		configRequestCache.set(this.siteId, request);
@@ -273,7 +281,9 @@ class ApiInstance {
 
 			if (!response.ok) throw new Error("Error getting referral link");
 
-			return response.json();
+			const data = await response.json();
+			devLog("API", "POST /v1/referrals/link response", data);
+			return data;
 		});
 	}
 
@@ -292,7 +302,9 @@ class ApiInstance {
 
 			// Some webhook responses might be empty
 			const text = await response.text();
-			return text ? JSON.parse(text) : { success: true };
+			const data = text ? JSON.parse(text) : { success: true };
+			devLog("API", "POST /v1/referrals/events response", data);
+			return data;
 		});
 	}
 }

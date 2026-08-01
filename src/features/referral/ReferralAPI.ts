@@ -7,6 +7,7 @@ import { EventQueue } from "./core/EventQueue";
 import { ITransport, collectMetadata } from "./transport/BaseTransport";
 import { CloudTransport } from "./transport/CloudTransport";
 import { SelfHostedTransport } from "./transport/SelfHostedTransport";
+import { devLog } from "../../shared/utils/devLog";
 
 export interface ReferralAPIDependencies {
   detector: ReferralDetector;
@@ -71,6 +72,7 @@ export class ReferralAPI {
     // Detect from URL
     const detectedCode = this.detector.detect();
     if (detectedCode) {
+      devLog("Action", "Referral code detected from URL", { code: detectedCode });
       this.storage.save({
         code: detectedCode,
         source: "query",
@@ -153,6 +155,7 @@ export class ReferralAPI {
 
   setReferrerIdentity(identity: ReferrerIdentity | undefined): void {
     this.referrerIdentity = identity;
+    devLog("Action", "Referrer identity set", identity);
     if (typeof window !== "undefined") {
       window.dispatchEvent(new CustomEvent('roastnest-identity-updated', { detail: identity }));
     }
@@ -189,7 +192,9 @@ export class ReferralAPI {
 
     try {
       await this.transport.send(payload);
+      devLog("Action", "Conversion tracked", payload);
     } catch (err) {
+      devLog("Action", "Conversion tracking failed, queued for retry", { payload, err });
       // If it fails, enqueue it for later retry
       this.queue.enqueue(payload);
       this.queue.scheduleRetry(this.transport);

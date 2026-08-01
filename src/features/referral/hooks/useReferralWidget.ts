@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { ReferralWidgetProps } from "../components/ReferralWidget/types";
+import { devLog } from "../../../shared/utils/devLog";
 
 /**
  * Widget state hook.
@@ -10,11 +11,13 @@ export function useReferralWidget(props: ReferralWidgetProps & { projectId: stri
 
   const open = useCallback(() => {
     setIsOpen(true);
+    devLog("Action", "Referral widget opened");
     props.onOpen?.();
   }, [props.onOpen]);
 
   const close = useCallback(() => {
     setIsOpen(false);
+    devLog("Action", "Referral widget closed");
     props.onClose?.();
   }, [props.onClose]);
 
@@ -22,6 +25,7 @@ export function useReferralWidget(props: ReferralWidgetProps & { projectId: stri
     try {
       await navigator.clipboard.writeText(props.referralLink);
       setLinkCopied(true);
+      devLog("Action", "Referral link copied", { referralLink: props.referralLink });
       props.onLinkCopied?.(props.referralLink, props.projectId!, props.referrerIdentity);
       setTimeout(() => setLinkCopied(false), props.copySuccessDuration || 2000);
     } catch (err) {
@@ -30,8 +34,9 @@ export function useReferralWidget(props: ReferralWidgetProps & { projectId: stri
   }, [props.referralLink, props.projectId, props.onLinkCopied, props.copySuccessDuration]);
 
   const share = useCallback(async () => {
+    devLog("Action", "Referral share triggered", { referralLink: props.referralLink });
     props.onShare?.(props.projectId!, props.referrerIdentity);
-    
+
     const text = props.shareMessage || `Join me on ${props.appName || 'this app'}!`;
     const shareData = {
       title: `${props.appName || 'App'} Referral`,

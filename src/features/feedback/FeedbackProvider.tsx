@@ -8,6 +8,7 @@ import { ToastProvider } from "../../shared/components/Toaster";
 
 import { CLASS_NAMES } from '../../utils/classNames';
 import { DEFAULT_FEEDBACK_CONFIG } from "./defaults";
+import { devLog } from "../../shared/utils/devLog";
 
 const initialSelectedValue: SelectedElement = {
     position: { x: 0, y: 0 },
@@ -42,6 +43,7 @@ export function FeedbackProvider({
             setActive((prev) => {
                 if (prev) unSelectElement();
                 setElementHoverable(!prev);
+                devLog("Action", prev ? "Feedback widget closed" : "Feedback widget opened");
                 return !prev;
             }),
         []

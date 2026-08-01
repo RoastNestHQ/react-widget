@@ -7,6 +7,7 @@ import ApiInstance from "../../../../shared/utils/api";
 import CheckIcon from "../../../../shared/icons/check";
 import Textarea from "../../../../shared/components/Textarea";
 import { toast } from "../../../../shared/components/Toaster";
+import { devLog } from "../../../../shared/utils/devLog";
 
 import { useState, FormEvent, Fragment, useEffect } from "react";
 import clsx from "clsx";
@@ -43,6 +44,7 @@ const FeedbackForm: React.FC = () => {
         if (mode === "self-hosted" && onFormSubmit instanceof Function) {
             setLoading(true);
             const isSubmitted = await onFormSubmit({ message, screenshotBlobs });
+            devLog("Action", "Self-hosted feedback form submitted", { message, isSubmitted });
             if (isSubmitted) {
                 setMessage("");
                 unSelectElement();
